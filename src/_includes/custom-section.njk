@@ -36,11 +36,10 @@
 <section class="section feature-cards">
   <div class="wrap">
     {% if section.heading %}<h2 style="text-align:center;">{{ section.heading }}</h2>{% endif %}
-    {% set icons = ["🥋", "🏮", "🏆"] %}
     <div class="grid grid--3">
       {% for card in section.cards %}
       <div class="card">
-        <div class="card__icon" aria-hidden="true">{{ icons[loop.index0 % 3] }}</div>
+        <div class="card__icon" aria-hidden="true">{{ loop.index }}</div>
         <h3>{{ card.heading }}</h3>
         <p class="muted">{{ card.text }}</p>
       </div>
@@ -53,11 +52,10 @@
 <section class="section services section--soft">
   <div class="wrap">
     {% if section.heading %}<h2 style="text-align:center;">{{ section.heading }}</h2>{% endif %}
-    {% set icons = ["🥋", "🦁", "🎭"] %}
     <div class="grid grid--3">
       {% for card in section.cards %}
       <div class="card">
-        <div class="card__icon" aria-hidden="true">{{ icons[loop.index0 % 3] }}</div>
+        <div class="card__icon" aria-hidden="true">{{ loop.index }}</div>
         <h3>{{ card.heading }}</h3>
         <p class="muted">{{ card.text }}</p>
         {% if card.link_url %}<a href="{{ card.link_url | url }}">{{ card.link_label or "Learn more" }} &rarr;</a>{% endif %}
@@ -133,14 +131,53 @@
 {% elif section.type == "tile_grid" %}
 <section class="section tile-grid">
   <div class="wrap">
-    {% if section.heading %}<h2 style="text-align:center;">{{ section.heading }}</h2>{% endif %}
-    <div class="grid grid--3">
+    {% if section.heading %}<h2 class="tile-grid__heading">{{ section.heading }}</h2>{% endif %}
+    <div class="tile-grid__grid">
       {% for tile in section.tiles %}
-      <div class="card">
-        {% if tile.image %}<img src="{{ tile.image | url }}" alt="" loading="lazy">{% endif %}
-        <h3>{{ tile.heading }}</h3>
-        <p class="muted">{{ tile.text }}</p>
-      </div>
+      <article class="tile">
+        {% if tile.image %}
+        <div class="tile__media">
+          <img src="{{ tile.image | url }}" alt="{{ tile.image_alt or '' }}" loading="lazy">
+        </div>
+        {% endif %}
+        <div class="tile__body">
+          <h3 class="tile__heading">{{ tile.heading }}</h3>
+          {% if tile.text %}<p class="tile__text">{{ tile.text }}</p>{% endif %}
+          {% if tile.button_label %}
+          <a class="btn btn--gold tile__cta" href="{{ tile.button_url | url }}">{{ tile.button_label }}</a>
+          {% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% elif section.type == "page_title" %}
+<section class="page-title">
+  <div class="wrap">
+    {% if section.eyebrow %}<span class="page-title__eyebrow">{{ section.eyebrow }}</span>{% endif %}
+    <h1 class="page-title__heading">{{ section.heading }}</h1>
+    {% if section.subheading %}<p class="page-title__sub">{{ section.subheading }}</p>{% endif %}
+  </div>
+</section>
+
+{% elif section.type == "page_hero" %}
+<section class="page-hero-media">
+  <div class="wrap">
+    <div class="page-hero-media__frame">
+      <img src="{{ section.image | url }}" alt="{{ section.image_alt or '' }}" loading="eager" width="1600" height="900">
+    </div>
+  </div>
+</section>
+
+{% elif section.type == "related_posts" %}
+<section class="section related-posts">
+  <div class="wrap">
+    {% if section.heading %}<h2 class="related-posts__heading">{{ section.heading }}</h2>{% endif %}
+    <div class="grid grid--3">
+      {% for post in collections.posts | limit(3) %}
+      {% include "post-card.njk" %}
       {% endfor %}
     </div>
   </div>

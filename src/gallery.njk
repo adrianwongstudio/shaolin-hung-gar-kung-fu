@@ -5,12 +5,17 @@ permalink: /gallery/
 description: Photos from Shaolin Hung Gar Kung Fu classes, lion dance performances, and community events.
 ---
 
-<section class="page-hero">
-  <div class="wrap">
-    <span class="eyebrow">Gallery</span>
-    <h1>Photos</h1>
-  </div>
-</section>
+{% set sections = [
+  {
+    "type": "page_title",
+    "eyebrow": "Photos",
+    "heading": "Gallery",
+    "subheading": "Photos from classes, lion dance performances, and community events."
+  }
+] %}
+{% for section in sections %}
+  {% include "custom-section.njk" %}
+{% endfor %}
 
 <section class="section" style="padding-top:0;">
   <div class="wrap">

@@ -173,8 +173,35 @@ collections:
                     widget: "list"
                     fields:
                       - { label: "Image", name: "image", widget: "image", required: false }
+                      - { label: "Image Alt Text", name: "image_alt", widget: "string", required: false, hint: "Describe the photo for screen readers." }
                       - { label: "Heading", name: "heading", widget: "string" }
-                      - { label: "Text", name: "text", widget: "text" }
+                      - { label: "Text", name: "text", widget: "text", required: false }
+                      - { label: "Button Label (optional)", name: "button_label", widget: "string", required: false }
+                      - { label: "Button Link (optional)", name: "button_url", widget: "string", required: false }
+
+              - label: "Page Title"
+                name: "page_title"
+                widget: "object"
+                summary: "Page Title — {{fields.heading}}"
+                fields:
+                  - { label: "Eyebrow (small label above the title)", name: "eyebrow", widget: "string", required: false }
+                  - { label: "Heading", name: "heading", widget: "string" }
+                  - { label: "Subheading", name: "subheading", widget: "text", required: false }
+
+              - label: "Page Hero (framed image)"
+                name: "page_hero"
+                widget: "object"
+                summary: "Page Hero — {{fields.image_alt}}"
+                fields:
+                  - { label: "Image", name: "image", widget: "image", hint: "Landscape 16:9 works best. Minimum 1600px wide." }
+                  - { label: "Image Alt Text", name: "image_alt", widget: "string", hint: "Describe the photo for screen readers." }
+
+              - label: "Related Blog Posts"
+                name: "related_posts"
+                widget: "object"
+                summary: "Related Posts — {{fields.heading}}"
+                fields:
+                  - { label: "Heading", name: "heading", widget: "string", required: false, default: "Related Blog Posts" }
 
               - label: "Two Column"
                 name: "two_column"

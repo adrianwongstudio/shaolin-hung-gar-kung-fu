@@ -5,79 +5,46 @@
       "slides": [
         {
           "image": "/images/shaolin-hung-kuen-2000px.png",
-          "alt": "Hung Gar kung fu students training in traditional stances",
+          "alt": "Traditional Hung Gar kung fu training",
           "eyebrow": "Vancouver, BC — Non-Profit School",
           "heading": "Traditional Hung Gar Kung Fu & Lion Dance",
           "button_label": "Book a Free Trial Class",
           "button_url": "/free-trial/"
+        }
+      ]
+    },
+    {
+      "type": "tile_grid",
+      "tiles": [
+        {
+          "image": "/images/shaolin-hung-kuen-2000px.png",
+          "image_alt": "Kung fu students in training stances",
+          "heading": "Kung Fu Classes",
+          "text": "Traditional Hung Gar forms, conditioning, and applied technique for youth and adults.",
+          "button_label": "See Classes",
+          "button_url": "/kung-fu/"
         },
         {
           "image": "/images/slhk-association-full-3000px.png",
-          "alt": "Lion dance troupe performing at a community event",
-          "eyebrow": "Lion Dance Troupe",
-          "heading": "Bringing Luck & Tradition to Your Event",
-          "button_label": "Book Lion Dance",
+          "image_alt": "Lion dance troupe in performance regalia",
+          "heading": "Lion Dance Classes",
+          "text": "Learn the Southern lion tradition — drum, gong, cymbal, and lion work — as a member of our troupe.",
+          "button_label": "Learn More",
+          "button_url": "/lion-dance/"
+        },
+        {
+          "image": "/images/shaolin-hung-kuen-traced-2000px.png",
+          "image_alt": "Community performance",
+          "heading": "Performances",
+          "text": "Book our lion dance troupe for Chinese New Year, grand openings, weddings, and corporate events.",
+          "button_label": "Book Us",
           "button_url": "/book-lion-dance/"
         }
       ]
     },
     {
-      "type": "consultation_banner",
-      "text": "New to kung fu? Your first class is always free — no experience or equipment needed.",
-      "button_label": "Reserve Your Spot",
-      "button_url": "/free-trial/"
-    },
-    {
-      "type": "feature_cards",
-      "heading": "Why Train With Us",
-      "cards": [
-        { "heading": "All Skill Levels Welcome", "text": "From first-timers to advanced students, every class is taught in traditional Hung Gar lineage." },
-        { "heading": "Community, Not a Franchise", "text": "We're a registered non-profit — every dollar goes back into the school and our lion dance troupe." },
-        { "heading": "Real Performance Experience", "text": "Students who want to perform can join the lion dance troupe for real community events." }
-      ]
-    },
-    {
-      "type": "services",
-      "heading": "What We Offer",
-      "cards": [
-        { "heading": "Kung Fu Classes", "text": "Traditional Hung Gar forms, conditioning, and sparring for youth and adults.", "link_url": "/kung-fu/", "link_label": "See Classes" },
-        { "heading": "Lion Dance Troupe", "text": "Performances for Chinese New Year, grand openings, weddings, and corporate events.", "link_url": "/lion-dance/", "link_label": "Book Us" },
-        { "heading": "Community Events", "text": "Workshops, demonstrations, and youth programs throughout the year.", "link_url": "/about/", "link_label": "Learn More" }
-      ]
-    },
-    {
-      "type": "about",
-      "heading": "Three Pillars: Discipline, Community, Tradition",
-      "text": "<p>Shaolin Hung Gar Kung Fu is a non-profit school dedicated to preserving Southern Shaolin martial arts and lion dance culture in Vancouver. Every class is rooted in the lineage passed down from our sifu, with an emphasis on discipline, respect, and community.</p>",
-      "stat_number": "3",
-      "stat_label": "Pillars: Discipline, Community, Tradition"
-    },
-    {
-      "type": "team",
-      "heading": "Meet the Instructors",
-      "members": [
-        { "photo": "/images/shaolin-hung-kuen-traced-2000px.png", "name": "Sifu (Head Instructor)", "role": "Head Instructor", "bio": "Trained in traditional Hung Gar lineage, teaching in Vancouver for over a decade." },
-        { "photo": "/images/shaolin-hung-kuen-traced-2000px.png", "name": "Assistant Instructor", "role": "Assistant Instructor", "bio": "Leads youth classes and lion dance drum training." },
-        { "photo": "/images/shaolin-hung-kuen-traced-2000px.png", "name": "Lion Dance Captain", "role": "Troupe Captain", "bio": "Coordinates performances and trains the lion dance troupe." },
-        { "photo": "/images/shaolin-hung-kuen-traced-2000px.png", "name": "Youth Program Lead", "role": "Youth Program Lead", "bio": "Runs our beginner and youth kung fu programs." }
-      ]
-    },
-    {
-      "type": "cta_band",
-      "heading": "Bring the Lion Dance to Your Next Event",
-      "text": "Grand openings, weddings, Chinese New Year celebrations, and corporate events.",
-      "style": "red",
-      "button_label": "Request a Booking",
-      "button_url": "/book-lion-dance/"
-    },
-    {
-      "type": "testimonial",
-      "quote": "My daughter has grown so much in confidence since joining. The instructors treat every student like family.",
-      "author_name": "Parent of a student, 2 years training"
-    },
-    {
       "type": "blog_list",
-      "heading": "From the School"
+      "heading": "Blog"
     }
   ]
 }

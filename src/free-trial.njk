@@ -5,13 +5,17 @@ permalink: /free-trial/
 description: Book a free trial kung fu class at Shaolin Hung Gar Kung Fu — no experience needed.
 ---
 
-<section class="page-hero">
-  <div class="wrap">
-    <span class="eyebrow">Free Trial Class</span>
-    <h1>Your First Class Is Free</h1>
-    <p class="muted">No experience or equipment needed — just come try it.</p>
-  </div>
-</section>
+{% set sections = [
+  {
+    "type": "page_title",
+    "eyebrow": "Get Started",
+    "heading": "Free Trial Class",
+    "subheading": "Your first class is on us — no experience or equipment needed."
+  }
+] %}
+{% for section in sections %}
+  {% include "custom-section.njk" %}
+{% endfor %}
 
 <section class="section form-page-section">
   <div class="wrap">

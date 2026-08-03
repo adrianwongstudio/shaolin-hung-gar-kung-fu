@@ -5,13 +5,17 @@ permalink: /book-lion-dance/
 description: Request a lion dance performance for your Chinese New Year, grand opening, wedding, or corporate event.
 ---
 
-<section class="page-hero">
-  <div class="wrap">
-    <span class="eyebrow">Book Lion Dance</span>
-    <h1>Request a Performance</h1>
-    <p class="muted">Tell us about your event and we'll follow up with availability and pricing.</p>
-  </div>
-</section>
+{% set sections = [
+  {
+    "type": "page_title",
+    "eyebrow": "Get In Touch",
+    "heading": "Book Lion Dance",
+    "subheading": "Tell us about your event and we'll follow up with availability and pricing."
+  }
+] %}
+{% for section in sections %}
+  {% include "custom-section.njk" %}
+{% endfor %}
 
 <section class="section form-page-section">
   <div class="wrap">

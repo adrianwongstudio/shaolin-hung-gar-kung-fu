@@ -1,32 +1,60 @@
 ---
 layout: layout.njk
-title: Kung Fu Classes
+title: Kung Fu
 permalink: /kung-fu/
 description: Traditional Hung Gar kung fu classes in Vancouver for youth and adults — all skill levels welcome.
 ---
 
-<section class="page-hero">
-  <div class="wrap">
-    <span class="eyebrow">Kung Fu</span>
-    <h1>Traditional Hung Gar Kung Fu</h1>
-    <p class="muted" style="max-width:60ch;">Rooted in Southern Shaolin lineage, our classes build strength, discipline, and confidence through traditional forms, conditioning, and applied technique.</p>
-  </div>
-</section>
+{% set sections = [
+  {
+    "type": "page_title",
+    "eyebrow": "Classes",
+    "heading": "Kung Fu",
+    "subheading": "Rooted in Southern Shaolin lineage — traditional forms, conditioning, and applied technique for youth and adults."
+  },
+  {
+    "type": "page_hero",
+    "image": "/images/shaolin-hung-kuen-2000px.png",
+    "image_alt": "Students practicing Hung Gar stances"
+  },
+  {
+    "type": "tile_grid",
+    "tiles": [
+      {
+        "image": "/images/shaolin-hung-kuen-traced-2000px.png",
+        "image_alt": "Warmup drills",
+        "heading": "Standardized Warmup",
+        "text": "Every class opens with the same conditioning sequence — stances, bridges, and breath work — so students build the foundation before form work.",
+        "button_label": "Book a Free Trial",
+        "button_url": "/free-trial/"
+      },
+      {
+        "image": "/images/shaolin-hung-kuen-2000px.png",
+        "image_alt": "Conditioning practice",
+        "heading": "Conditioning",
+        "text": "Hung Gar's low stances and iron-bridge work build strength that carries into daily life, not just the training hall.",
+        "button_label": "Book a Free Trial",
+        "button_url": "/free-trial/"
+      },
+      {
+        "image": "/images/slhk-association-full-3000px.png",
+        "image_alt": "Kung fu forms",
+        "heading": "Kung Fu Forms",
+        "text": "Traditional forms including the Tiger-Crane, taught in lineage as they were passed down — not modernized derivatives.",
+        "button_label": "Book a Free Trial",
+        "button_url": "/free-trial/"
+      }
+    ]
+  },
+  {
+    "type": "related_posts",
+    "heading": "Related Blog Posts"
+  }
+] %}
 
-<section class="section">
-  <div class="wrap">
-    <div class="two-column">
-      <img src="{{ '/images/shaolin-hung-kuen-2000px.png' | url }}" alt="Student practicing a Hung Gar stance" loading="lazy">
-      <div>
-        <h2>Lineage &amp; Style</h2>
-        <div class="prose">
-          <p>Hung Gar is one of the oldest and most recognized Southern Shaolin styles, known for its low, powerful stances and the Tiger-Crane form. Our sifu carries this lineage directly and teaches it in its traditional form — not a modernized derivative.</p>
-          <p>Classes combine forms (<em>tao lu</em>), conditioning, bridge-hand drills, and — for students who want it — sparring and lion dance fundamentals.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+{% for section in sections %}
+  {% include "custom-section.njk" %}
+{% endfor %}
 
 <section class="section section--soft">
   <div class="wrap">
@@ -46,29 +74,5 @@ description: Traditional Hung Gar kung fu classes in Vancouver for youth and adu
       </div>
     </div>
     <p class="muted" style="text-align:center; margin-top:24px;">Schedule may vary around holidays and performances — confirmed times are shared with enrolled students.</p>
-  </div>
-</section>
-
-<section class="section">
-  <div class="wrap">
-    <h2 style="text-align:center;">Membership</h2>
-    <p class="muted" style="text-align:center; max-width:60ch; margin:0 auto 32px;">We're a non-profit school — membership fees cover space rental, equipment, and troupe costume upkeep, not profit.</p>
-    <div class="grid grid--3">
-      <div class="card">
-        <h3>Drop-In</h3>
-        <p class="muted">Try a single class before committing.</p>
-      </div>
-      <div class="card">
-        <h3>Monthly Membership</h3>
-        <p class="muted">Unlimited classes for your age group.</p>
-      </div>
-      <div class="card">
-        <h3>Family Rate</h3>
-        <p class="muted">Discounted rate for a second family member.</p>
-      </div>
-    </div>
-    <p style="text-align:center; margin-top:32px;">
-      <a class="btn btn--gold" href="{{ '/free-trial/' | url }}">Book Your Free Trial Class</a>
-    </p>
   </div>
 </section>

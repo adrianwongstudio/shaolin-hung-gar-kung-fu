@@ -11,12 +11,17 @@ eleventyComputed:
   title: "{% if pagination.pageNumber == 0 %}Blog{% else %}Blog — Page {{ pagination.pageNumber + 1 }}{% endif %}"
 ---
 
-<section class="page-hero">
-  <div class="wrap">
-    <span class="eyebrow">Blog</span>
-    <h1>News &amp; Stories</h1>
-  </div>
-</section>
+{% set sections = [
+  {
+    "type": "page_title",
+    "eyebrow": "News & Stories",
+    "heading": "Blog",
+    "subheading": "Updates from the school, recaps from lion dance performances, and guides for new students."
+  }
+] %}
+{% for section in sections %}
+  {% include "custom-section.njk" %}
+{% endfor %}
 
 <section class="section" style="padding-top:0;">
   <div class="wrap">
