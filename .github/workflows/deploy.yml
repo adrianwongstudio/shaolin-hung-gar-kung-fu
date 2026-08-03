@@ -22,6 +22,18 @@ jobs:
           PATH_PREFIX: /shaolin-hung-gar-kung-fu/
       - uses: actions/configure-pages@v5
         with: { enablement: true }
+      # Force Pages source to "GitHub Actions" (workflow mode). The Pages UI
+      # can silently flip this back to "Deploy from a branch" (legacy) as a
+      # side effect of clearing a custom domain or other settings changes.
+      # When that happens, deploys succeed but the site 404s because Pages
+      # tries to serve from main branch root instead of our _site artifact.
+      # This step is a no-op when Pages is already in workflow mode.
+      - name: Force Pages source to workflow mode
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -X PUT "repos/${{ github.repository }}/pages" \
+            -f "build_type=workflow" || echo "Pages already in workflow mode"
       - uses: actions/upload-pages-artifact@v3
         with: { path: _site }
   deploy:

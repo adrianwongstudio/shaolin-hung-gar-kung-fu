@@ -721,7 +721,26 @@ repo. If two repos both have that CNAME, only one wins. **Clear the domain
 from the losing repo before setting it on the new one**, or accept a brief
 404 window during handoff.
 
-### 9. `/admin/` "Server Not Found" on the hosted site
+### 9. Pages Source silently reverts from "GitHub Actions" to "Deploy from a branch"
+The Pages configuration has a `build_type` field: `workflow` (this template's
+setup — Actions builds and uploads the artifact) or `legacy` (deploy directly
+from a repo branch). Changing an *unrelated* Pages setting via the UI —
+notably clearing a custom domain — can silently flip `build_type` back to
+`legacy`. When that happens, workflow runs still succeed (the artifact
+uploads fine), but Pages serves the wrong thing: legacy mode reads from the
+`main` branch root, which has no `index.html` at the top level, so the site
+returns a 404 across the board.
+
+The dead giveaway: `gh api "repos/<owner>/<repo>/pages"` shows
+`"build_type": "legacy"` when it should be `"workflow"`.
+
+Fix immediately: `gh api -X PUT "repos/<owner>/<repo>/pages" -f
+"build_type=workflow"` — then re-trigger the workflow so the artifact goes
+live under the new mode. Prevention: the deploy workflow now includes a
+"Force Pages source to workflow mode" step that PUTs `build_type=workflow`
+on every run, self-healing this silently if it ever flips again.
+
+### 10. `/admin/` "Server Not Found" on the hosted site
 The template ships with `backend.base_url:
 https://replace_me_with_your_oauth_worker.workers.dev` in
 `src/admin/config.yml` as a placeholder. Until you deploy the Cloudflare

@@ -515,6 +515,15 @@ order or the sticky Pages setting keeps redirecting:
 - **After going live on the custom domain, some links still point at
   `/<repo>/`** — `PATH_PREFIX` is still in `deploy.yml`. Delete the env
   block and re-deploy.
+- **Whole site 404s at the project URL even though the workflow succeeded** —
+  Pages Source flipped from "GitHub Actions" to "Deploy from a branch"
+  (legacy mode). Clearing a custom domain in the Pages UI can silently
+  trigger this. Diagnose with `gh api "repos/<owner>/<repo>/pages"` — if
+  `build_type` is `legacy` instead of `workflow`, that's the bug. The
+  deploy workflow now self-heals on every run via a "Force Pages source
+  to workflow mode" step, so this should only happen once per site (on
+  the specific action that flipped it, before the next workflow run
+  catches and fixes it).
 - **`/admin/` shows "Server Not Found" trying to reach
   `replace_me_with_your_oauth_worker.workers.dev`** — the CMS on the
   *hosted* site is trying to auth against the placeholder OAuth Worker
