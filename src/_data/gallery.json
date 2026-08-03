@@ -1,0 +1,10 @@
+{
+  "items": [
+    { "category": "Kung Fu", "image": "/images/shaolin-hung-kuen-2000px.png", "alt": "Kung fu student practicing a traditional stance" },
+    { "category": "Kung Fu", "image": "/images/shaolin-hung-kuen-traced-2000px.png", "alt": "Kung fu training session" },
+    { "category": "Lion Dance", "image": "/images/slhk-association-full-3000px.png", "alt": "Lion dance troupe performing" },
+    { "category": "Lion Dance", "image": "/images/shaolin-hung-kuen-2000px.png", "alt": "Lion dance performance detail" },
+    { "category": "Events", "image": "/images/slhk-association-full-3000px.png", "alt": "Community event performance" },
+    { "category": "Events", "image": "/images/shaolin-hung-kuen-traced-2000px.png", "alt": "School community gathering" }
+  ]
+}

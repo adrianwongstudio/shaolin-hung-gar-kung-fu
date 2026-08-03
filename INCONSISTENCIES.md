@@ -9,7 +9,7 @@
 | ID | Item | Status |
 |---|---|---|
 | BLOCKER-1 | Two incompatible tech stacks | ✅ Resolved — Eleventy |
-| BLOCKER-2 | Codebase not in this folder | 🔴 Open |
+| BLOCKER-2 | Codebase not in this folder | ✅ Resolved — scaffolded, not yet deployed |
 | BLOCKER-3 | Figma unavailable | ✅ Resolved — file read |
 | HIGH-1 | Three answers on form submission | ✅ Resolved — Apps Script, all docs updated |
 | HIGH-2 | Two colour palettes | ✅ Resolved — red/gold/cream |
@@ -91,11 +91,13 @@ These are mutually exclusive. Next.js and Eleventy are different runtimes with d
 
 **RESOLVED — 2026-08-02:** Stay on **Eleventy 3.x**. Tailwind CSS may be layered in as the styling system; Framer Motion is replaced with CSS transitions plus a small vanilla-JS interaction layer (or Motion One if a JS animation library is genuinely needed). TypeScript and Shadcn UI are dropped — they have no meaningful role in an Eleventy/Nunjucks build.
 
-**Still open:** confirm whether Tailwind replaces `src/css/style.css` entirely, or sits alongside the existing CSS-custom-property token block. Recommendation: Tailwind with the brand tokens defined in `tailwind.config.js` `theme.extend`, so there is exactly one source of truth for colour.
+**Resolved (2026-08-02):** No Tailwind. `src/css/style.css`'s CSS-custom-property token block is the single source of truth for colour — this keeps the build dependency-free, which matters more than matching Figma's tooling for a volunteer-maintained non-profit site.
 
 ---
 
 ## BLOCKER-2 — The code described in these docs is not in this folder
+
+**Status: ✅ Resolved (2026-08-02) — scaffolded fresh from the blueprint** (option b below). The Eleventy build, all 8 page templates, the CMS config, the paginated blog, both forms, and `apps-script/`/`oauth-worker/` source now exist under `src/`, `.eleventy.js`, and `test/`. Not deployed — no Cloudflare Worker, GitHub OAuth App, or Apps Script Web App has been created; those remain manual steps in `design.md`'s external-services checklist when the site is ready to go live. The original finding is kept below for the record.
 
 **Where:** filesystem vs. `design.md` §Repository layout.
 
@@ -411,8 +413,8 @@ The brief asks for *"faster loading"* and *"readability"*, but no doc states a t
 
 | # | Decision | Blocking? |
 |---|---|---|
-| 1 | Tailwind replaces `style.css`, or coexists with the token block | Yes — affects every component |
-| 2 | Where the actual Eleventy codebase is coming from (BLOCKER-2) | Yes |
+| 1 | ~~Tailwind replaces `style.css`, or coexists with the token block~~ | Resolved — no Tailwind; plain CSS custom-property tokens only, to keep the build dependency-free |
+| 2 | ~~Where the actual Eleventy codebase is coming from (BLOCKER-2)~~ | Resolved — scaffolded fresh |
 | 3 | Figma access — authorize connector or export frames (BLOCKER-3) | Yes |
 | 4 | One form or two (free trial vs. lion dance booking) — HIGH-3 | Yes |
 | 5 | Time dropdown: discrete slots or coarse bands — MEDIUM-6 | No |

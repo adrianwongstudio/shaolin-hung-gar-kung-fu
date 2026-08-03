@@ -1,0 +1,267 @@
+backend:
+  name: github
+  repo: adrianwongstudio/shaolinhunggarkungfu.com
+  branch: main
+  base_url: https://replace_me_with_your_oauth_worker.workers.dev
+
+local_backend: true
+
+media_folder: "src/images"
+public_folder: "/images"
+
+site_url: https://shaolinhunggarkungfu.com
+
+collections:
+  - name: "posts"
+    label: "Blog Posts"
+    folder: "src/posts"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false, hint: "Controls sort order and the /blog/ listing." }
+      - { label: "Category", name: "category", widget: "relation", collection: "categories", search_fields: ["name"], value_field: "name", display_fields: ["name"], hint: "Pick one — add new categories from the Categories section." }
+      - { label: "Tags", name: "tags", widget: "relation", collection: "tags", search_fields: ["name"], value_field: "name", display_fields: ["name"], multiple: true, required: false, hint: "Add new tags from the Tags section." }
+      - { label: "Featured Image", name: "image", widget: "image", hint: "Used on the blog card and post header. Landscape works best." }
+      - { label: "Image Focus", name: "image_position", widget: "select", options: ["top", "center", "bottom"], default: "center", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "text", hint: "One-liner shown on the blog card." }
+      - { label: "Author Bio", name: "author_bio", widget: "text", required: false, hint: "One-paragraph bio shown at the bottom of the post." }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "categories"
+    label: "Categories"
+    folder: "src/_data/categories"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+
+  - name: "tags"
+    label: "Tags"
+    folder: "src/_data/tags"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+
+  - name: "home"
+    label: "Home Page"
+    files:
+      - name: "home"
+        label: "Home Page Content"
+        file: "src/_data/home.json"
+        fields:
+          - label: "Page Sections"
+            name: "sections"
+            widget: "list"
+            collapsed: true
+            minimize_collapsed: true
+            summary: "{{fields.type}} — {{fields.heading}}"
+            types:
+              - label: "Hero Slider"
+                name: "hero_slider"
+                widget: "object"
+                summary: "Hero Slider"
+                fields:
+                  - label: "Slides"
+                    name: "slides"
+                    widget: "list"
+                    collapsed: true
+                    summary: "{{fields.heading}}"
+                    fields:
+                      - { label: "Image", name: "image", widget: "image", hint: "Landscape, with headroom for overlaid text. Minimum 1600px wide." }
+                      - { label: "Alt Text", name: "alt", widget: "string", hint: "Describe the photo for screen readers." }
+                      - { label: "Eyebrow (optional)", name: "eyebrow", widget: "string", required: false }
+                      - { label: "Heading", name: "heading", widget: "string" }
+                      - { label: "Button Label", name: "button_label", widget: "string", required: false }
+                      - { label: "Button Link", name: "button_url", widget: "string", required: false }
+
+              - label: "Consultation Banner"
+                name: "consultation_banner"
+                widget: "object"
+                summary: "Banner — {{fields.text}}"
+                fields:
+                  - { label: "Text", name: "text", widget: "string" }
+                  - { label: "Button Label", name: "button_label", widget: "string", required: false }
+                  - { label: "Button Link", name: "button_url", widget: "string", required: false }
+
+              - label: "Feature Cards"
+                name: "feature_cards"
+                widget: "object"
+                summary: "Feature Cards — {{fields.heading}}"
+                fields:
+                  - { label: "Heading", name: "heading", widget: "string", required: false }
+                  - label: "Cards"
+                    name: "cards"
+                    widget: "list"
+                    max: 3
+                    hint: "Icons cycle through a fixed set of 3 — a 4th card repeats the first icon."
+                    fields:
+                      - { label: "Heading", name: "heading", widget: "string" }
+                      - { label: "Text", name: "text", widget: "text" }
+
+              - label: "Services"
+                name: "services"
+                widget: "object"
+                summary: "Services — {{fields.heading}}"
+                fields:
+                  - { label: "Heading", name: "heading", widget: "string", required: false }
+                  - label: "Cards"
+                    name: "cards"
+                    widget: "list"
+                    fields:
+                      - { label: "Heading", name: "heading", widget: "string" }
+                      - { label: "Text", name: "text", widget: "text" }
+                      - { label: "Link Label", name: "link_label", widget: "string", required: false }
+                      - { label: "Link URL", name: "link_url", widget: "string", required: false }
+
+              - label: "Service Cards (no icons)"
+                name: "service_cards"
+                widget: "object"
+                summary: "Service Cards — {{fields.heading}}"
+                fields:
+                  - { label: "Heading", name: "heading", widget: "string", required: false }
+                  - label: "Cards"
+                    name: "cards"
+                    widget: "list"
+                    fields:
+                      - { label: "Heading", name: "heading", widget: "string" }
+                      - { label: "Text", name: "text", widget: "text" }
+
+              - label: "About (text + stat)"
+                name: "about"
+                widget: "object"
+                summary: "About — {{fields.heading}}"
+                fields:
+                  - { label: "Heading", name: "heading", widget: "string", required: false }
+                  - { label: "Text", name: "text", widget: "markdown" }
+                  - { label: "Stat Number", name: "stat_number", widget: "string", required: false, hint: "e.g. \"3\"" }
+                  - { label: "Stat Label", name: "stat_label", widget: "string", required: false, hint: "e.g. \"Pillars: Discipline, Community, Tradition\"" }
+
+              - label: "Team"
+                name: "team"
+                widget: "object"
+                summary: "Team — {{fields.heading}}"
+                fields:
+                  - { label: "Heading", name: "heading", widget: "string", required: false }
+                  - label: "Members"
+                    name: "members"
+                    widget: "list"
+                    collapsed: true
+                    summary: "{{fields.name}}"
+                    fields:
+                      - { label: "Photo", name: "photo", widget: "image", hint: "Upload at least 600x600 for a sharp result." }
+                      - { label: "Name", name: "name", widget: "string" }
+                      - { label: "Role", name: "role", widget: "string" }
+                      - { label: "Bio", name: "bio", widget: "text" }
+
+              - label: "Latest Blog Posts"
+                name: "blog_list"
+                widget: "object"
+                summary: "Blog List — {{fields.heading}}"
+                fields:
+                  - { label: "Heading", name: "heading", widget: "string", required: false }
+
+              - label: "Tile Grid"
+                name: "tile_grid"
+                widget: "object"
+                summary: "Tile Grid — {{fields.heading}}"
+                fields:
+                  - { label: "Heading", name: "heading", widget: "string", required: false }
+                  - label: "Tiles"
+                    name: "tiles"
+                    widget: "list"
+                    fields:
+                      - { label: "Image", name: "image", widget: "image", required: false }
+                      - { label: "Heading", name: "heading", widget: "string" }
+                      - { label: "Text", name: "text", widget: "text" }
+
+              - label: "Two Column"
+                name: "two_column"
+                widget: "object"
+                summary: "Two Column — {{fields.heading}}"
+                fields:
+                  - { label: "Heading", name: "heading", widget: "string", required: false }
+                  - { label: "Text", name: "text", widget: "markdown" }
+                  - { label: "Image", name: "image", widget: "image", required: false }
+                  - { label: "Image Alt Text", name: "image_alt", widget: "string", required: false }
+                  - { label: "Image Position", name: "image_position", widget: "select", options: ["left", "right"], default: "left" }
+                  - { label: "Button Label", name: "button_label", widget: "string", required: false }
+                  - { label: "Button Link", name: "button_url", widget: "string", required: false }
+
+              - label: "Call To Action Band"
+                name: "cta_band"
+                widget: "object"
+                summary: "CTA Band — {{fields.heading}}"
+                fields:
+                  - { label: "Heading", name: "heading", widget: "string", required: false }
+                  - { label: "Text", name: "text", widget: "text", required: false }
+                  - { label: "Style", name: "style", widget: "select", options: ["red", "gold", "soft", "plain"], default: "red" }
+                  - { label: "Button Label", name: "button_label", widget: "string", required: false }
+                  - { label: "Button Link", name: "button_url", widget: "string", required: false }
+
+              - label: "Rich Text"
+                name: "rich_text"
+                widget: "object"
+                summary: "Rich Text"
+                fields:
+                  - { label: "Body", name: "body", widget: "markdown" }
+
+              - label: "Testimonial"
+                name: "testimonial"
+                widget: "object"
+                summary: "Testimonial — {{fields.author_name}}"
+                fields:
+                  - { label: "Quote", name: "quote", widget: "text" }
+                  - { label: "Author Name", name: "author_name", widget: "string" }
+
+              - label: "Video Embed"
+                name: "video_embed"
+                widget: "object"
+                summary: "Video — {{fields.heading}}"
+                fields:
+                  - { label: "Heading (optional)", name: "heading", widget: "string", required: false }
+                  - { label: "Video URL (YouTube or Vimeo embed URL)", name: "url", widget: "string", hint: "Paste the embed URL, not the watch URL. YouTube: https://www.youtube.com/embed/VIDEO_ID" }
+                  - { label: "Caption (optional)", name: "caption", widget: "text", required: false }
+
+  - name: "gallery"
+    label: "Gallery"
+    files:
+      - name: "gallery"
+        label: "Gallery Photos"
+        file: "src/_data/gallery.json"
+        fields:
+          - label: "Items"
+            name: "items"
+            widget: "list"
+            collapsed: true
+            summary: "{{fields.category}} — {{fields.alt}}"
+            fields:
+              - { label: "Category", name: "category", widget: "relation", collection: "categories", search_fields: ["name"], value_field: "name", display_fields: ["name"] }
+              - { label: "Photo", name: "image", widget: "image" }
+              - { label: "Alt Text", name: "alt", widget: "string", hint: "Describe the photo for screen readers." }
+
+  - name: "settings"
+    label: "Settings"
+    files:
+      - name: "site"
+        label: "Site Settings"
+        file: "src/_data/site.json"
+        fields:
+          - { label: "Business Name", name: "name", widget: "string" }
+          - { label: "Tagline", name: "tagline", widget: "string" }
+          - { label: "Description", name: "description", widget: "text", hint: "Used in page <meta> tags and the footer." }
+          - { label: "Phone", name: "phone", widget: "string", hint: "Human-readable format, e.g. \"+1 (604) 555 0148\" — the tel: link is generated automatically." }
+          - { label: "Email", name: "email", widget: "string" }
+          - { label: "Secondary Email", name: "email_secondary", widget: "string", required: false }
+          - { label: "Address", name: "address", widget: "string", required: false }
+          - { label: "Logo", name: "logo", widget: "image" }
+          - { label: "Site URL", name: "url", widget: "string", hint: "Used for canonical links — the live domain, including https://." }
+
+      - name: "forms"
+        label: "Forms Settings"
+        file: "src/_data/forms.json"
+        fields:
+          - { label: "Apps Script Endpoint", name: "endpoint", widget: "string", hint: "Set once by a developer during setup — see design.md. Do not edit unless told to." }
+          - { label: "Inquiry Types (Book Lion Dance form)", name: "inquiry_types", widget: "list", hint: "One option per line, plain text — becomes the dropdown on /book-lion-dance/." }
+          - { label: "Time Bands (Book Lion Dance form)", name: "time_bands", widget: "list", hint: "One option per line, plain text." }

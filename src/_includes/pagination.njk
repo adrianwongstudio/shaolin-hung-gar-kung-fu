@@ -1,0 +1,39 @@
+{% if pager.totalPages > 1 %}
+{% set current = pager.pageNumber + 1 %}
+<nav class="pager" aria-label="Pagination">
+
+  {% if current > 1 %}
+    <a class="pager__step" rel="prev"
+       href="{{ pagerBase if current == 2 else pagerBase + 'page/' + (current - 1) + '/' }}">
+      <span aria-hidden="true">&larr;</span> Previous
+    </a>
+  {% else %}
+    <span class="pager__step is-disabled" aria-hidden="true">&larr; Previous</span>
+  {% endif %}
+
+  <ol class="pager__list">
+    {% for p in range(1, pager.totalPages + 1) %}
+      {% set show = p == 1 or p == pager.totalPages or (p >= current - 1 and p <= current + 1) %}
+      {% if show %}
+        <li>
+          {% if p == current %}
+            <span class="pager__num is-current" aria-current="page">{{ p }}</span>
+          {% else %}
+            <a class="pager__num" href="{{ pagerBase if p == 1 else pagerBase + 'page/' + p + '/' }}">{{ p }}</a>
+          {% endif %}
+        </li>
+      {% elif p == 2 or p == pager.totalPages - 1 %}
+        <li><span class="pager__gap" aria-hidden="true">&hellip;</span></li>
+      {% endif %}
+    {% endfor %}
+  </ol>
+
+  {% if current < pager.totalPages %}
+    <a class="pager__step" rel="next"
+       href="{{ pagerBase + 'page/' + (current + 1) + '/' }}">
+      Next <span aria-hidden="true">&rarr;</span>
+    </a>
+  {% endif %}
+
+</nav>
+{% endif %}

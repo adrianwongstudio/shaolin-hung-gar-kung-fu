@@ -1,0 +1,33 @@
+<aside class="blog-sidebar">
+  <div class="blog-sidebar__widget">
+    <h3>Categories</h3>
+    <ul class="cat-list">
+      {% for c in collections.categoryPages %}
+        {% if c.pageNumber == 0 %}
+        <li>
+          <a href="{{ ('/blog/category/' + (c.name | slugify) + '/') | url }}">{{ c.name }}</a>
+          <span class="count">{{ c.totalPosts }}</span>
+        </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+
+  {% set _tags = collections.tagPages | firstPageOnly %}
+
+  {% if _tags.length %}
+  <div class="blog-sidebar__widget">
+    <h3>Tags</h3>
+    {% set _tagMax = 1 %}
+    {% for t in _tags %}{% if t.posts.length > _tagMax %}{% set _tagMax = t.posts.length %}{% endif %}{% endfor %}
+
+    <div class="tag-cloud">
+      {% for tag in _tags %}
+        {% set _ratio = tag.posts.length / _tagMax %}
+        {% set _tier = 'lg' if _ratio >= 0.66 else ('md' if _ratio >= 0.33 else 'sm') %}
+        <a class="chip chip--{{ _tier }}" href="{{ ('/blog/tag/' + (tag.name | slugify) + '/') | url }}">{{ tag.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</aside>

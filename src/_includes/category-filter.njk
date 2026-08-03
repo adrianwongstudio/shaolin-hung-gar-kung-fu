@@ -1,0 +1,13 @@
+<nav class="cat-filter" aria-label="Filter by category">
+  <a class="chip {{ 'is-active' if page.url == '/blog/' or '/blog/page/' in page.url }}"
+     href="{{ '/blog/' | url }}">All</a>
+  {% for c in collections.categoryPages %}
+    {% if c.pageNumber == 0 %}
+      {% set slug = c.name | slugify %}
+      <a class="chip {{ 'is-active' if ('/blog/category/' + slug + '/') in page.url }}"
+         href="{{ ('/blog/category/' + slug + '/') | url }}">
+        {{ c.name }} <span class="chip__count">{{ c.totalPosts }}</span>
+      </a>
+    {% endif %}
+  {% endfor %}
+</nav>

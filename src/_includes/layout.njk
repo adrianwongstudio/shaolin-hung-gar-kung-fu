@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}{% if title != site.name %} | {{ site.name }}{% endif %}</title>
+  <meta name="description" content="{{ description or site.description }}">
+  <link rel="canonical" href="{{ site.url }}{{ page.url }}">
+  {% if pagination.href.previous %}<link rel="prev" href="{{ site.url }}{{ pagination.href.previous }}">{% endif %}
+  {% if pagination.href.next %}<link rel="next" href="{{ site.url }}{{ pagination.href.next }}">{% endif %}
+  <link rel="icon" href="{{ site.logo | url }}">
+  <link rel="stylesheet" href="{{ '/css/style.css' | url }}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="wrap">
+      <ul class="topbar__contact">
+        <li><a href="{{ site.phone | telHref }}">{{ site.phone }}</a></li>
+        <li class="hide-sm"><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+        {% if site.address %}<li class="hide-sm">{{ site.address }}</li>{% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header" id="site-header">
+    <div class="wrap">
+      <a class="brand" href="{{ '/' | url }}">
+        <img src="{{ site.logo | url }}" alt="{{ site.name }} logo">
+        <span>{{ site.name }}</span>
+      </a>
+
+      <nav class="nav" aria-label="Primary">
+        <a href="{{ '/' | url }}" class="{{ 'active' if page.url == '/' }}">Home</a>
+        <a href="{{ '/kung-fu/' | url }}" class="{{ 'active' if page.url == '/kung-fu/' }}">Kung Fu</a>
+        <a href="{{ '/lion-dance/' | url }}" class="{{ 'active' if page.url == '/lion-dance/' }}">Lion Dance</a>
+        <a href="{{ '/gallery/' | url }}" class="{{ 'active' if page.url == '/gallery/' }}">Gallery</a>
+        <a href="{{ '/blog/' | url }}" class="{{ 'active' if '/blog/' in page.url }}">Blog</a>
+        <a href="{{ '/about/' | url }}" class="{{ 'active' if page.url == '/about/' }}">About</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="{{ '/free-trial/' | url }}" class="btn btn--gold">Free Trial Class</a>
+        <a href="{{ '/book-lion-dance/' | url }}" class="btn btn--red">Book Lion Dance</a>
+      </div>
+
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-overlay" aria-label="Open menu">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile nav overlay -->
+  <div class="nav-overlay" id="nav-overlay" role="dialog" aria-modal="true" aria-label="Site menu" hidden>
+    <button class="nav-overlay__close" id="nav-overlay-close" aria-label="Close menu">&times;</button>
+    <nav aria-label="Mobile">
+      <a href="{{ '/' | url }}">Home</a>
+      <a href="{{ '/kung-fu/' | url }}">Kung Fu</a>
+      <a href="{{ '/lion-dance/' | url }}">Lion Dance</a>
+      <a href="{{ '/gallery/' | url }}">Gallery</a>
+      <a href="{{ '/blog/' | url }}">Blog</a>
+      <a href="{{ '/about/' | url }}">About</a>
+      <a href="{{ '/free-trial/' | url }}" class="btn btn--gold" style="margin-top:16px;">Free Trial Class</a>
+      <a href="{{ '/book-lion-dance/' | url }}" class="btn btn--red" style="margin-top:8px;">Book Lion Dance</a>
+    </nav>
+  </div>
+
+  <main id="main">
+    {{ content | safe }}
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="grid">
+        <div>
+          <h4>{{ site.name }}</h4>
+          <p class="muted">{{ site.tagline }}</p>
+        </div>
+        <div>
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="{{ '/kung-fu/' | url }}">Kung Fu</a></li>
+            <li><a href="{{ '/lion-dance/' | url }}">Lion Dance</a></li>
+            <li><a href="{{ '/gallery/' | url }}">Gallery</a></li>
+            <li><a href="{{ '/blog/' | url }}">Blog</a></li>
+            <li><a href="{{ '/about/' | url }}">About</a></li>
+            <li><a href="{{ '/free-trial/' | url }}">Free Trial Class</a></li>
+            <li><a href="{{ '/book-lion-dance/' | url }}">Book Lion Dance</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="{{ site.phone | telHref }}">{{ site.phone }}</a></li>
+            <li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+            {% if site.address %}<li>{{ site.address }}</li>{% endif %}
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; {% year %} {{ site.name }}. Non-profit kung fu &amp; lion dance school.</span>
+        <span><a href="{{ '/admin/' | url }}">Editor login</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ '/js/nav.js' | url }}" defer></script>
+  <script src="{{ '/js/slider.js' | url }}" defer></script>
+  <script src="{{ '/js/form-logic.js' | url }}" defer></script>
+  <script src="{{ '/js/form.js' | url }}" defer></script>
+</body>
+</html>

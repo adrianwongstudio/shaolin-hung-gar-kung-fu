@@ -1,0 +1,73 @@
+---
+layout: layout.njk
+title: Lion Dance
+permalink: /lion-dance/
+description: Book our lion dance troupe for Chinese New Year, grand openings, weddings, and corporate events in Vancouver.
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">Lion Dance</span>
+    <h1>Bring Luck &amp; Tradition to Your Event</h1>
+    <p class="muted" style="max-width:60ch;">Our lion dance troupe performs for Chinese New Year, grand openings, weddings, and corporate events across Metro Vancouver.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="two-column two-column--image-right">
+      <img src="{{ '/images/slhk-association-full-3000px.png' | url }}" alt="Lion dance troupe performing" loading="lazy">
+      <div>
+        <h2>What We Offer</h2>
+        <div class="prose">
+          <p>Every troupe member trains in kung fu first — lion dance is a performance art built on real martial skill, not just costume work. That shows in the precision and stamina of every performance.</p>
+          <p>We perform the Southern (Cantonese) lion style, with live drum, gong, and cymbal accompaniment.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="wrap">
+    <h2 style="text-align:center;">Performance Types</h2>
+    <div class="grid grid--3">
+      <div class="card">
+        <h3>Chinese New Year</h3>
+        <p class="muted">Traditional blessing performances for homes and businesses.</p>
+      </div>
+      <div class="card">
+        <h3>Grand Openings</h3>
+        <p class="muted">Bring good fortune to a new business location.</p>
+      </div>
+      <div class="card">
+        <h3>Weddings &amp; Corporate Events</h3>
+        <p class="muted">Custom performances for private celebrations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <h2 style="text-align:center;">Past Events</h2>
+    <div class="grid grid--3">
+      {% for i in range(0, 3) %}
+      <div class="card">
+        <img src="{{ '/images/shaolin-hung-kuen-2000px.png' | url }}" alt="Lion dance performance photo" loading="lazy" style="border-radius: var(--radius); margin-bottom: 12px;">
+        <p class="muted">Performance photos are added by our editors as events happen.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="cta-band cta-band--red">
+      <h2>Ready to Book?</h2>
+      <p>Tell us about your event and we'll follow up with availability and pricing.</p>
+      <a class="btn btn--gold" href="{{ '/book-lion-dance/' | url }}">Request a Booking</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,39 @@
+---
+layout: layout.njk
+title: Gallery
+permalink: /gallery/
+description: Photos from Shaolin Hung Gar Kung Fu classes, lion dance performances, and community events.
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">Gallery</span>
+    <h1>Photos</h1>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    <nav class="gallery-filter" aria-label="Filter gallery by category" id="gallery-filter">
+      <button class="chip is-active" data-filter="all">All</button>
+      {% for cat in gallery.items | uniqueBy("category") %}
+      <button class="chip" data-filter="{{ cat.category | slugify }}">{{ cat.category }}</button>
+      {% endfor %}
+    </nav>
+
+    <div class="gallery-grid" id="gallery-grid">
+      {% for item in gallery.items %}
+      <a class="gallery-grid__item" href="{{ item.image | url }}" data-category="{{ item.category | slugify }}" data-full="{{ item.image | url }}" data-alt="{{ item.alt }}">
+        <img src="{{ item.image | url }}" alt="{{ item.alt }}" loading="lazy" width="400" height="400">
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <button class="lightbox__close" id="lightbox-close" aria-label="Close photo viewer">&times;</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script src="{{ '/js/gallery.js' | url }}" defer></script>

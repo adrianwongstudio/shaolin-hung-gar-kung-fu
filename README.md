@@ -59,6 +59,18 @@ rebuilds automatically.
 npm run build     # produces the finished site in _site/
 ```
 
+## Testing
+
+```bash
+npm test          # unit tests (pure logic) + integration tests (builds the
+                   # site, then asserts against _site/ — see test/)
+npm run coverage  # same, with a v8 coverage report
+```
+
+See [`testing.md`](./testing.md) for the manual playbook (CMS smoke test,
+responsive/cross-viewport check, production smoke test after deploy) — the
+parts that can't be asserted against a build output.
+
 ## Deploy
 
 Every push to `main` triggers `.github/workflows/deploy.yml` — Eleventy

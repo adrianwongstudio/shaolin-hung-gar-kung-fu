@@ -1,0 +1,90 @@
+---
+layout: layout.njk
+title: Book Lion Dance
+permalink: /book-lion-dance/
+description: Request a lion dance performance for your Chinese New Year, grand opening, wedding, or corporate event.
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">Book Lion Dance</span>
+    <h1>Request a Performance</h1>
+    <p class="muted">Tell us about your event and we'll follow up with availability and pricing.</p>
+  </div>
+</section>
+
+<section class="section form-page-section">
+  <div class="wrap">
+    <div class="form-page">
+      <form
+        class="js-form"
+        action="{{ forms.endpoint }}"
+        method="POST"
+        data-form-type="book-lion-dance"
+        data-thanks-url="{{ '/thanks/' | url }}"
+        data-phone="{{ site.phone }}"
+        novalidate
+      >
+        <div class="form-status" aria-live="polite"></div>
+        <input type="hidden" name="js_enabled" value="0">
+        <div class="field field--honeypot">
+          <label for="bld-website">Leave this field empty</label>
+          <input type="text" id="bld-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="bld-name">Name</label>
+          <input type="text" id="bld-name" name="name" required autocomplete="name">
+        </div>
+
+        <div class="field">
+          <label for="bld-email">Email</label>
+          <input type="email" id="bld-email" name="email" required autocomplete="email">
+        </div>
+
+        <div class="field">
+          <label for="bld-phone">Phone</label>
+          <input type="tel" id="bld-phone" name="phone" autocomplete="tel">
+        </div>
+
+        <div class="field">
+          <label for="bld-organization">Organization (if applicable)</label>
+          <input type="text" id="bld-organization" name="organization" autocomplete="organization">
+        </div>
+
+        <div class="field">
+          <label for="bld-inquiry-type">Type of Inquiry</label>
+          <select id="bld-inquiry-type" name="inquiry_type" required>
+            <option value="" disabled selected>Select one&hellip;</option>
+            {% for type in forms.inquiry_types %}
+            <option value="{{ type }}">{{ type }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="bld-event-date">Event Date</label>
+          <input type="date" id="bld-event-date" name="event_date" min="{% today %}" required>
+          <p class="field-hint">Dates are sent exactly as selected — no timezone conversion.</p>
+        </div>
+
+        <div class="field">
+          <label for="bld-event-time">Time</label>
+          <select id="bld-event-time" name="event_time" required>
+            <option value="" disabled selected>Select a time band&hellip;</option>
+            {% for band in forms.time_bands %}
+            <option value="{{ band }}">{{ band }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="bld-details">Details</label>
+          <textarea id="bld-details" name="details" placeholder="Venue, expected guest count, anything else we should know" required></textarea>
+        </div>
+
+        <button class="btn btn--red form-submit" type="submit">Request Booking</button>
+      </form>
+    </div>
+  </div>
+</section>

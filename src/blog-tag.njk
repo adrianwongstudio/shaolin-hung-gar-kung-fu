@@ -1,0 +1,38 @@
+---
+layout: layout.njk
+pagination:
+  data: collections.tagPages
+  size: 1
+  alias: tag
+permalink: "{% if tag.pageNumber == 0 %}/blog/tag/{{ tag.name | slugify }}/{% else %}/blog/tag/{{ tag.name | slugify }}/page/{{ tag.pageNumber + 1 }}/{% endif %}"
+eleventyComputed:
+  title: "#{{ tag.name }}{% if tag.pageNumber > 0 %} — Page {{ tag.pageNumber + 1 }}{% endif %}"
+  description: "Articles tagged {{ tag.name }}."
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">Tag</span>
+    <h1>#{{ tag.name }}</h1>
+    <p class="result-count">{{ tag.totalPosts }} article{{ "s" if tag.totalPosts != 1 }}</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    {% include "category-filter.njk" %}
+
+    <div class="blog-grid">
+      <div class="posts">
+        {% for post in tag.posts %}
+          {% include "post-card.njk" %}
+        {% endfor %}
+      </div>
+      {% include "blog-sidebar.njk" %}
+    </div>
+
+    {% set pager = { pageNumber: tag.pageNumber, totalPages: tag.totalPages } %}
+    {% set pagerBase = ("/blog/tag/" + (tag.name | slugify) + "/") %}
+    {% include "pagination.njk" %}
+  </div>
+</section>

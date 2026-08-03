@@ -1,0 +1,36 @@
+---
+layout: layout.njk
+---
+<article class="section">
+  <div class="wrap prose" style="margin:0 auto;">
+    {% if image %}
+    <div class="post-hero-img">
+      <img src="{{ image | url }}" alt="" width="1200" height="675" loading="eager">
+    </div>
+    {% endif %}
+
+    {% if category %}
+    <a class="badge" href="{{ ('/blog/category/' + (category | slugify) + '/') | url }}">{{ category }}</a>
+    {% endif %}
+    <h1>{{ title }}</h1>
+    <time datetime="{{ date | isoDate }}" class="muted">{{ date | readableDate }}</time>
+
+    {{ content | safe }}
+
+    {% if tags and tags.length %}
+    <div class="post-tags">
+      {% for tag in tags %}
+      <a class="chip chip--sm" href="{{ ('/blog/tag/' + (tag | slugify) + '/') | url }}">{{ tag }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if author_bio %}
+    <div class="author-bio">
+      <p><strong>About the author:</strong> {{ author_bio }}</p>
+    </div>
+    {% endif %}
+
+    <a class="back-link" href="{{ '/blog/' | url }}">&larr; Back to all articles</a>
+  </div>
+</article>

@@ -1,0 +1,203 @@
+{% if section.type == "hero_slider" %}
+<section class="hero-wrap wrap">
+  <div class="hero-slider">
+    <div class="hero-slider__track">
+      {% for slide in section.slides %}
+      <div class="hero-slider__slide">
+        <img src="{{ slide.image | url }}" alt="{{ slide.alt or '' }}" {% if loop.index0 == 0 %}loading="eager"{% else %}loading="lazy"{% endif %} width="1600" height="900">
+        <div class="hero-slider__scrim"></div>
+        <div class="hero-slider__content">
+          {% if slide.eyebrow %}<span class="eyebrow" style="color: var(--gold);">{{ slide.eyebrow }}</span>{% endif %}
+          <h1>{{ slide.heading }}</h1>
+          {% if slide.button_label %}<a class="btn btn--gold" href="{{ slide.button_url | url }}">{{ slide.button_label }}</a>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% if section.slides.length > 1 %}
+    <div class="hero-slider__dots">
+      {% for slide in section.slides %}
+      <button class="hero-slider__dot {{ 'is-active' if loop.index0 == 0 }}" aria-label="Show slide {{ loop.index }}"></button>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% elif section.type == "consultation_banner" %}
+<div class="consultation-banner">
+  <div class="wrap">
+    <p style="margin:0; font-weight:600;">{{ section.text }}</p>
+    {% if section.button_label %}<a class="btn btn--red" href="{{ section.button_url | url }}">{{ section.button_label }}</a>{% endif %}
+  </div>
+</div>
+
+{% elif section.type == "feature_cards" %}
+<section class="section feature-cards">
+  <div class="wrap">
+    {% if section.heading %}<h2 style="text-align:center;">{{ section.heading }}</h2>{% endif %}
+    {% set icons = ["🥋", "🏮", "🏆"] %}
+    <div class="grid grid--3">
+      {% for card in section.cards %}
+      <div class="card">
+        <div class="card__icon" aria-hidden="true">{{ icons[loop.index0 % 3] }}</div>
+        <h3>{{ card.heading }}</h3>
+        <p class="muted">{{ card.text }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% elif section.type == "services" %}
+<section class="section services section--soft">
+  <div class="wrap">
+    {% if section.heading %}<h2 style="text-align:center;">{{ section.heading }}</h2>{% endif %}
+    {% set icons = ["🥋", "🦁", "🎭"] %}
+    <div class="grid grid--3">
+      {% for card in section.cards %}
+      <div class="card">
+        <div class="card__icon" aria-hidden="true">{{ icons[loop.index0 % 3] }}</div>
+        <h3>{{ card.heading }}</h3>
+        <p class="muted">{{ card.text }}</p>
+        {% if card.link_url %}<a href="{{ card.link_url | url }}">{{ card.link_label or "Learn more" }} &rarr;</a>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% elif section.type == "service_cards" %}
+<section class="section service-cards">
+  <div class="wrap">
+    {% if section.heading %}<h2 style="text-align:center;">{{ section.heading }}</h2>{% endif %}
+    <div class="grid grid--3">
+      {% for card in section.cards %}
+      <div class="card">
+        <h3>{{ card.heading }}</h3>
+        <p class="muted">{{ card.text }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% elif section.type == "about" %}
+<section class="section about">
+  <div class="wrap">
+    <div class="about-block">
+      <div>
+        {% if section.heading %}<h2>{{ section.heading }}</h2>{% endif %}
+        <div class="prose">{{ section.text | safe }}</div>
+      </div>
+      {% if section.stat_number %}
+      <div class="about-block__stat">
+        <div class="num">{{ section.stat_number }}</div>
+        <p>{{ section.stat_label }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% elif section.type == "team" %}
+<section class="section team section--soft">
+  <div class="wrap">
+    {% if section.heading %}<h2 style="text-align:center;">{{ section.heading }}</h2>{% endif %}
+    <div class="grid">
+      {% for member in section.members %}
+      <div class="card">
+        <img src="{{ member.photo | url }}" alt="{{ member.name }}" width="300" height="300" loading="lazy">
+        <h3>{{ member.name }}</h3>
+        <p class="eyebrow">{{ member.role }}</p>
+        <p class="muted">{{ member.bio }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% elif section.type == "blog_list" %}
+<section class="section blog-list">
+  <div class="wrap">
+    {% if section.heading %}<h2 style="text-align:center;">{{ section.heading }}</h2>{% endif %}
+    <div class="grid">
+      {% for post in collections.posts | limit(3) %}
+      {% include "post-card.njk" %}
+      {% endfor %}
+    </div>
+    <p style="text-align:center; margin-top:32px;"><a class="btn btn--red" href="{{ '/blog/' | url }}">View All Articles</a></p>
+  </div>
+</section>
+
+{% elif section.type == "tile_grid" %}
+<section class="section tile-grid">
+  <div class="wrap">
+    {% if section.heading %}<h2 style="text-align:center;">{{ section.heading }}</h2>{% endif %}
+    <div class="grid grid--3">
+      {% for tile in section.tiles %}
+      <div class="card">
+        {% if tile.image %}<img src="{{ tile.image | url }}" alt="" loading="lazy">{% endif %}
+        <h3>{{ tile.heading }}</h3>
+        <p class="muted">{{ tile.text }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% elif section.type == "two_column" %}
+<section class="section two-column-section">
+  <div class="wrap">
+    <div class="two-column {{ 'two-column--image-right' if section.image_position == 'right' }}">
+      {% if section.image %}<img src="{{ section.image | url }}" alt="{{ section.image_alt or '' }}" loading="lazy">{% endif %}
+      <div>
+        {% if section.heading %}<h2>{{ section.heading }}</h2>{% endif %}
+        <div class="prose">{{ section.text | safe }}</div>
+        {% if section.button_label %}<a class="btn btn--red" href="{{ section.button_url | url }}">{{ section.button_label }}</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% elif section.type == "cta_band" %}
+<section class="section">
+  <div class="wrap">
+    <div class="cta-band cta-band--{{ section.style or 'red' }}">
+      {% if section.heading %}<h2>{{ section.heading }}</h2>{% endif %}
+      {% if section.text %}<p>{{ section.text }}</p>{% endif %}
+      {% if section.button_label %}
+      <a class="btn {{ 'btn--gold' if section.style == 'red' else 'btn--red' }}" href="{{ section.button_url | url }}">{{ section.button_label }}</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% elif section.type == "rich_text" %}
+<section class="section">
+  <div class="wrap">
+    <div class="prose" style="margin:0 auto;">{{ section.body | safe }}</div>
+  </div>
+</section>
+
+{% elif section.type == "testimonial" %}
+<section class="section testimonial section--ink">
+  <div class="wrap">
+    <div class="testimonial">
+      <blockquote>&ldquo;{{ section.quote }}&rdquo;</blockquote>
+      <p class="eyebrow">{{ section.author_name }}</p>
+    </div>
+  </div>
+</section>
+
+{% elif section.type == "video_embed" %}
+<section class="section">
+  <div class="wrap">
+    {% if section.heading %}<h2 style="text-align:center;">{{ section.heading }}</h2>{% endif %}
+    <div class="video-embed">
+      <iframe src="{{ section.url }}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="{{ section.heading or 'Video' }}"></iframe>
+    </div>
+    {% if section.caption %}<p style="text-align:center; color: var(--muted); margin-top: 16px;">{{ section.caption }}</p>{% endif %}
+  </div>
+</section>
+{% endif %}

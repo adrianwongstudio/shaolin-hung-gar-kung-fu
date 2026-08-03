@@ -1,0 +1,41 @@
+---
+layout: layout.njk
+title: Blog
+description: News, stories, and updates from Shaolin Hung Gar Kung Fu.
+pagination:
+  data: collections.posts
+  size: 9
+  alias: posts
+permalink: "{% if pagination.pageNumber == 0 %}/blog/{% else %}/blog/page/{{ pagination.pageNumber + 1 }}/{% endif %}"
+eleventyComputed:
+  title: "{% if pagination.pageNumber == 0 %}Blog{% else %}Blog — Page {{ pagination.pageNumber + 1 }}{% endif %}"
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">Blog</span>
+    <h1>News &amp; Stories</h1>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    {% include "category-filter.njk" %}
+
+    <div class="blog-grid">
+      <div class="posts">
+        {% for post in posts %}
+          {% include "post-card.njk" %}
+        {% endfor %}
+      </div>
+      {% include "blog-sidebar.njk" %}
+    </div>
+
+    {# Eleventy's native pagination object has no totalPages — hrefs.length
+       is the real page count (see PAGINATION.md for the pageNumber/totalPages
+       shape pagination.njk expects). #}
+    {% set pager = { pageNumber: pagination.pageNumber, totalPages: pagination.hrefs.length } %}
+    {% set pagerBase = "/blog/" %}
+    {% include "pagination.njk" %}
+  </div>
+</section>

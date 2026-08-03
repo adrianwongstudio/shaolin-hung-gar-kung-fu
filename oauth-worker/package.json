@@ -1,0 +1,15 @@
+{
+  "name": "decap-oauth-proxy-shaolin-hung-gar",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "login": "wrangler login",
+    "secret:client-id": "wrangler secret put GITHUB_CLIENT_ID",
+    "secret:client-secret": "wrangler secret put GITHUB_CLIENT_SECRET",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

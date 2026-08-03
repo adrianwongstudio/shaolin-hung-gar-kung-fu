@@ -1,0 +1,23 @@
+{
+  "name": "shaolinhunggarkungfu.com",
+  "version": "1.0.0",
+  "description": "Marketing site for Shaolin Hung Gar Kung Fu — Vancouver kung fu school and lion dance troupe.",
+  "private": true,
+  "license": "MIT",
+  "type": "commonjs",
+  "scripts": {
+    "start": "eleventy --serve",
+    "build": "eleventy",
+    "cms": "decap-server",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.0.0",
+    "@vitest/coverage-v8": "^2.1.4",
+    "decap-server": "^3.2.0",
+    "js-yaml": "^4.1.0",
+    "vitest": "^2.1.4"
+  }
+}

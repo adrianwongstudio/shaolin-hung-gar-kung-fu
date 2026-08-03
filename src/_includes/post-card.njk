@@ -1,0 +1,11 @@
+<a class="post-card" href="{{ post.url | url }}">
+  <div class="post-card__img">
+    <img src="{{ post.data.image | url }}" alt="" width="480" height="300" loading="lazy">
+  </div>
+  <div class="post-card__body">
+    {% if post.data.category %}<span class="badge">{{ post.data.category }}</span>{% endif %}
+    <h3>{{ post.data.title }}</h3>
+    <time datetime="{{ post.data.date | isoDate }}">{{ post.data.date | readableDate }}</time>
+    {% if post.data.excerpt %}<p class="muted">{{ post.data.excerpt }}</p>{% endif %}
+  </div>
+</a>

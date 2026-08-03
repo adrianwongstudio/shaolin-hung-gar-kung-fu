@@ -1,0 +1,10 @@
+---
+layout: layout.njk
+title: Home
+permalink: /
+description: A non-profit Hung Gar kung fu school and lion dance troupe in Vancouver, teaching traditional Southern Shaolin martial arts to all ages.
+---
+
+{% for section in home.sections %}
+{% include "custom-section.njk" %}
+{% endfor %}
