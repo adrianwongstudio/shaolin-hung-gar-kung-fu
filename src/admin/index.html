@@ -7,5 +7,90 @@
 </head>
 <body>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+    // Load the live site's stylesheet into every preview iframe so what
+    // editors see while writing matches the deployed site's typography,
+    // colors, and section styles. The path is relative to /admin/index.html
+    // so it works whether the site is served at github.io/<repo>/ or the
+    // custom domain — no PATH_PREFIX branching needed.
+    CMS.registerPreviewStyle("../css/style.css");
+
+    const h = CMS.h;
+
+    function formatDate(iso) {
+      if (!iso) return "";
+      const d = new Date(iso);
+      if (isNaN(d)) return "";
+      return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    }
+
+    // Blog post preview — mirrors the shape of src/_includes/post.njk so the
+    // preview reads like the actual published post.
+    CMS.registerPreviewTemplate("posts", ({ entry, getAsset, widgetFor }) => {
+      const data = entry.getIn(["data"]).toJS();
+      const imageUrl = data.image ? getAsset(data.image).toString() : null;
+      const tags = Array.isArray(data.tags) ? data.tags : [];
+
+      return h("article", { className: "post" },
+        h("div", { className: "wrap wrap--narrow" },
+          h("header", { className: "post__header" },
+            data.category && h("span", { className: "eyebrow" }, data.category),
+            h("h1", { className: "post__title" }, data.title || "(untitled)"),
+            data.date && h("time", { className: "post__date" }, formatDate(data.date)),
+            data.excerpt && h("p", { className: "post__excerpt" }, data.excerpt)
+          ),
+          imageUrl && h("img", {
+            className: "post__image",
+            src: imageUrl,
+            alt: data.title || "",
+            style: {
+              display: "block",
+              width: "100%",
+              height: "auto",
+              borderRadius: "var(--radius, 10px)",
+              margin: "24px 0"
+            }
+          }),
+          h("div", { className: "post__body prose" }, widgetFor("body")),
+          tags.length > 0 && h("ul", { className: "post-tags" },
+            tags.map((t) => h("li", { key: t }, h("span", { className: "tag" }, t)))
+          ),
+          data.author_bio && h("aside", { className: "post__author-bio" },
+            h("p", null, data.author_bio)
+          )
+        )
+      );
+    });
+
+    // Home page preview — friendly summary of the sections list. Full
+    // section-by-section render would duplicate the Nunjucks dispatcher; a
+    // structured summary is more useful for spotting order/typo issues at a
+    // glance and is much lighter to maintain. Click "View Live" to see the
+    // fully-rendered page.
+    CMS.registerPreviewTemplate("home", ({ entry }) => {
+      const data = entry.getIn(["data"]).toJS();
+      const sections = Array.isArray(data.sections) ? data.sections : [];
+      return h("div", { className: "wrap", style: { padding: "24px" } },
+        h("h1", null, "Home Page — section preview"),
+        h("p", { style: { color: "var(--muted)" } },
+          "Structural preview. Click ",
+          h("strong", null, "View Live"),
+          " (top right) after saving to see the fully-rendered page."
+        ),
+        h("ol", { style: { paddingLeft: "20px" } },
+          sections.map((s, i) => h("li", { key: i, style: { marginBottom: "16px" } },
+            h("strong", null, s.type || "(no type)"),
+            s.heading && h("span", null, " — ", s.heading),
+            s.slides && h("div", { style: { color: "var(--muted)", fontSize: "0.9em" } },
+              s.slides.length + " slide(s)"),
+            s.rows && h("div", { style: { color: "var(--muted)", fontSize: "0.9em" } },
+              s.rows.length + " row(s)"),
+            s.cards && h("div", { style: { color: "var(--muted)", fontSize: "0.9em" } },
+              s.cards.length + " card(s)")
+          ))
+        )
+      );
+    });
+  </script>
 </body>
 </html>

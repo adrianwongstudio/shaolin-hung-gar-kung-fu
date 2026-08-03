@@ -9,7 +9,12 @@ local_backend: true
 media_folder: "src/images"
 public_folder: "/images"
 
-site_url: https://shaolinhunggarkungfu.com
+# site_url is what the "View Live" button prefixes preview_path with.
+# While DNS for shaolinhunggarkungfu.com is being set up, we're deploying
+# under the project URL — swap the two lines when the custom domain goes
+# live (same time you drop PATH_PREFIX from .github/workflows/deploy.yml).
+site_url: https://adrianwongstudio.github.io/shaolin-hung-gar-kung-fu
+# site_url: https://shaolinhunggarkungfu.com
 
 collections:
   - name: "posts"
@@ -17,6 +22,9 @@ collections:
     folder: "src/posts"
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    # Powers the "View Live" button in the editor. Uses just the title-derived
+    # slug because our post permalink is /blog/{slug}/, not date-prefixed.
+    preview_path: "blog/{{slug}}"
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false, hint: "Controls sort order and the /blog/ listing." }

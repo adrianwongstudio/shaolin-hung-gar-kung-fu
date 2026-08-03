@@ -17,3 +17,7 @@ coverage/
 # Test artifacts (Playwright — reserved for future)
 playwright-report/
 test-results/
+
+# Local reference material — not part of the shipped site
+website example/
+website-example/
