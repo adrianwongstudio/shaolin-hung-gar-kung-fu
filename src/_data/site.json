@@ -1,11 +1,11 @@
 {
+  "logo": "/images/shaolin-hung-kuen.svg",
   "name": "Shaolin Hung Gar Kung Fu Association",
+  "phone": "+1 (604) 999 9999",
   "tagline": "Traditional Kung Fu & Lion Dance in Vancouver",
-  "description": "A non-profit Hung Gar kung fu school and lion dance troupe in Vancouver, teaching traditional Southern Shaolin martial arts to all ages.",
-  "phone": "+1 (604) 555 0148",
-  "email": "info@shaolinhunggarkungfu.com",
+  "url": "https://shaolinhunggarkungfu.com",
   "email_secondary": "",
   "address": "Vancouver, BC",
-  "logo": "/images/shaolin-hung-kuen.svg",
-  "url": "https://shaolinhunggarkungfu.com"
+  "email": "info@shaolinhunggarkungfu.com",
+  "description": "A non-profit Hung Gar kung fu school and lion dance troupe in Vancouver, teaching traditional Southern Shaolin martial arts to all ages."
 }
