@@ -117,16 +117,19 @@ Open `http://localhost:8080/` and click every page:
   chips below the body (if the post has any), "Back to all articles" link
 - **`/blog/category/<any-slug>/`** — filter page, only the matching posts
 - **`/blog/tag/<any-slug>/`** — filter page, only tagged posts
-- **`/contact/`** — form renders, phone/email/address correct, map iframe
-  loads
-- **`/contact/thanks/`** — reached by typing the URL directly (fine)
+- **`/kung-fu/`**, **`/lion-dance/`**, **`/about/`**, **`/gallery/`** —
+  static pages render; gallery filter chips and lightbox work
+- **`/free-trial/`** — short form renders (name, email, phone, details)
+- **`/book-lion-dance/`** — long form renders (adds organization, type of
+  inquiry, event date, time)
+- **`/thanks/`** — reached by typing the URL directly (fine)
 - **`/definitely-not-a-page`** — reaches the styled 404 (via Eleventy
   serving `_site/404.html` on unknown URLs)
 
 **Click every link at least once** on the home page and blog listing:
 category badges → category filter page, tag chips → tag filter page,
-"View All Articles" → `/blog/`, footer nav → each page, "Get a Quote"
-buttons → `/contact/`.
+"View All Articles" → `/blog/`, footer nav → each page, "Free Trial Class"
+→ `/free-trial/`, "Book Lion Dance" → `/book-lion-dance/`.
 
 ---
 
@@ -146,18 +149,18 @@ button locally, `npm run cms` isn't running or the port is blocked.
 **Full CMS smoke test (~5 min):**
 
 1. **Home Page → Home Page Content** — the Page Sections list should show
-   all current sections collapsed with meaningful summaries (e.g. "Team —
-   Meet the Legacy Financial Planning Team"). Drag one section to a
+   all current sections collapsed with meaningful summaries (e.g. "team —
+   Meet the Instructors"). Drag one section to a
    different position → save → the change appears in `src/_data/home.json`
    on disk immediately (git status shows it modified) → the running dev
    server rebuilds → the front-end reflects the reorder.
 2. **Add a section** — click "Add Section", pick any type, fill required
    fields, publish. Verify it renders on `/`. Then delete it, verify it's
    gone.
-3. **Categories** — add a category (e.g. "Retirement"). It should appear
-   as a file `src/_data/categories/retirement.yml` and show up in the
-   Category dropdown on the Blog Posts form. Delete it and confirm it
-   disappears from the dropdown.
+3. **Categories** — add a category (e.g. "Community Events"). It should
+   appear as a file `src/_data/categories/community-events.yml` and show
+   up in the Category dropdown on the Blog Posts form (and the Gallery
+   Photos form). Delete it and confirm it disappears from the dropdown.
 4. **Tags** — same pattern.
 5. **Blog Posts → New Blog Post** — fill title, date, category, add tags
    (both existing + newly-added), upload a featured image, add body,
@@ -203,13 +206,13 @@ counts. To verify the heatmap sizing:
 ```yaml
 # In one post's frontmatter:
 tags:
-  - home         # add to 3 posts total
-  - savings      # 1 post
-  - family       # 1 post
+  - hung-gar     # already on several posts — will read as the largest chip
+  - beginners    # a couple of posts
+  - competition  # fewest posts
 ```
 
-Then check `/blog/` sidebar — `home` should be visibly larger than
-`savings`. Revert the tags before committing (unless they're real).
+Then check `/blog/` sidebar — `hung-gar` should be visibly larger than
+`competition`. Revert the tags before committing (unless they're real).
 
 **Pattern 3 — Verify build output without touching the browser**
 
@@ -293,13 +296,17 @@ Every push to `main` triggers an Actions run. Wait for the green check
 
 6. Home page — every section renders. Screenshot and eyeball against the
    previous state if you did a layout change.
-7. Contact form — submit a test message. Should redirect to
-   `/contact/thanks/` and you should get an email at
-   `info@shaolinhunggarkungfu.com` within a minute.
+7. Free Trial form — submit a test message. Should show the inline
+   success state (or redirect to `/thanks/` with JavaScript disabled),
+   and you should get a staff notification + sender confirmation email
+   within a minute.
+8. Book Lion Dance form — same check, plus confirm the event date lands
+   on the correct day in the Sheet (see the "Booking dates land one day
+   off" regression below).
 
 **Once per new build touching admin/config.yml or the CMS:**
 
-8. `https://shaolinhunggarkungfu.com/admin/` — Login with GitHub works,
+9. `https://shaolinhunggarkungfu.com/admin/` — Login with GitHub works,
    sidebar shows all collections, opening a blog post loads its fields
    correctly.
 
@@ -322,8 +329,8 @@ Bugs we've hit before. If you touched adjacent code, re-verify these:
   while the visible number was updated via `site.phone`. Clicks dialed the
   wrong number.
 - **How to verify:** On any page, hover the phone link, confirm the URL
-  matches the number you see. `grep 'tel:' src/_includes/layout.njk src/contact.njk`
-  — every match should use `{{ site.phone | replace(...) }}`, not a
+  matches the number you see. `grep 'tel:' src/_includes/layout.njk`
+  — every match should use `{{ site.phone | telHref }}`, not a
   hardcoded number.
 
 ### `tags` frontmatter doesn't leak "posts"
@@ -470,32 +477,44 @@ Bugs we've hit before. If you touched adjacent code, re-verify these:
 
 ---
 
-## What could be automated
+## What's automated, and what's still a reasonable next step
 
-Not built. Listed here as a reasonable next step if the site gets more
-active or another editor joins:
+**Built** — `npm test` (see [`README.md`](./README.md#testing)) runs on
+every `pull_request` via `.github/workflows/pr-check.yml`:
 
-- **CI build check on PRs** — a lightweight `pull_request` trigger on the
-  workflow that runs `npm ci && npm run build` (skipping `deploy`).
-  Catches template/config errors before merge.
+- Unit tests for the pure logic (`src/_lib/*`, `src/js/form-logic.js`) —
+  pagination chunking, filters, honeypot/form-type validation.
+- Integration tests that build the site and assert against `_site/`: all
+  8 pages exist, pagination has no orphan page 1, `rel=prev`/`rel=next`
+  and `aria-current` are present, both forms have the right fields and
+  share one endpoint, the CMS config is valid YAML and covers every
+  section type the template dispatcher supports, images carry `alt`, and
+  the deploy workflow YAML itself parses (a real bug — `${{ }}` inside an
+  inline flow mapping is invalid YAML — was caught this way).
+- `npm run coverage` reports v8 coverage; kept above a threshold in
+  `vitest.config.js` so it can't silently regress.
+
+This covers most of what a Playwright smoke test or an HTML validator
+would catch, without needing a browser in CI. Not built, and still a
+reasonable next step if the site gets more active or another editor
+joins:
+
 - **Link checker** — `npx linkinator _site/ --recurse` as a CI step to
   catch broken internal links (e.g. a deleted category still referenced
   by a post).
-- **HTML validation** — `npx html-validate _site/**/*.html`. Cheap and
-  catches structural issues.
 - **Lighthouse budget** — `npx lighthouse https://<domain>/ --output json`
   with thresholds on Performance / Accessibility / SEO. Runs in CI on a
   schedule; alerts if scores regress.
-- **Playwright smoke test** — one script that visits `/`, `/blog/`,
-  `/contact/`, checks each has a `<h1>` and no console errors. Runs on
-  deploy.
+- **Playwright visual/interaction smoke test** — a real browser opening
+  `/`, `/blog/`, `/gallery/`, both forms; checks the mobile nav overlay,
+  hero slider, and lightbox actually work, not just that the markup for
+  them exists. The current test suite can't see rendered layout or run
+  JavaScript, so this is the gap it doesn't cover.
 - **Form endpoint monitor** — POST a test payload (flagged `is_test: true`
   so the script skips the notification email) to the Apps Script URL daily
   and alert if the response isn't `{ok:true}`. Catches the
-  redeploy-changed-the-URL failure before a real customer hits it.
-- **(legacy note) Formspree submission monitor** — send a scripted submission daily and
-  confirm the email arrives (e.g. a Zapier flow that alerts if it
-  doesn't).
+  redeploy-changed-the-URL failure before a real customer hits it. Only
+  relevant once the Apps Script Web App is actually deployed.
 
 Each of those adds 15-30 minutes of setup and pays off if the site
 becomes something people can accidentally break. For a 1-editor
