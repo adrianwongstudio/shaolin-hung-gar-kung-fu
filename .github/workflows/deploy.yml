@@ -13,7 +13,13 @@ jobs:
         with: { node-version: "22", cache: "npm" }
       - run: npm ci
       - run: npm test
+      # PATH_PREFIX is set so absolute-path assets resolve under the
+      # project-site URL (https://<user>.github.io/<repo>/). Remove this
+      # env once the custom domain (src/CNAME) is verified and DNS is live —
+      # a custom-domain site serves from "/" and PATH_PREFIX would break it.
       - run: npm run build
+        env:
+          PATH_PREFIX: /shaolin-hung-gar-kung-fu/
       - uses: actions/configure-pages@v5
         with: { enablement: true }
       - uses: actions/upload-pages-artifact@v3
