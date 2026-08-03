@@ -774,9 +774,22 @@ NOT prevent someone running `wrangler deploy` directly (bypassing the
 npm script). Always use `npm run deploy` from `oauth-worker/`, never
 bare `wrangler deploy`.
 
-**Recovery when it happens:** from `oauth-worker/`, run `npm run deploy`.
-The preflight passes, wrangler redeploys the OAuth code, secrets are
-untouched (they persist on the Worker name), CMS login works again.
+**Recovery when it happens:** from `oauth-worker/`, run `npm run deploy`
+— preflight passes, wrangler redeploys the OAuth code. THEN also re-set
+the secrets:
+
+```bash
+cd oauth-worker
+npx wrangler secret list                  # expect [] — they got wiped
+npx wrangler secret put GITHUB_CLIENT_ID
+npx wrangler secret put GITHUB_CLIENT_SECRET
+```
+
+Deploying a static-assets worker on top of a JS worker resets the
+secret bindings — the Worker *name* survives but the secrets attached
+to it don't carry over across a deployment-type change. Miss this step
+and `/auth` redirects to GitHub with `client_id=undefined` and a
+GitHub 404.
 
 ### 11. `/admin/` "Server Not Found" on the hosted site
 The template ships with `backend.base_url:
