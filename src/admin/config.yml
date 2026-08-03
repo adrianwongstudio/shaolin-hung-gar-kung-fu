@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: adrianwongstudio/shaolinhunggarkungfu.com
+  repo: adrianwongstudio/shaolin-hung-gar-kung-fu
   branch: main
   base_url: https://shaolin-decap-oauth-proxy.legacy-financial-planning.workers.dev
 
