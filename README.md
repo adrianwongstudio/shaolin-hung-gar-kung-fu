@@ -75,11 +75,28 @@ parts that can't be asserted against a build output.
 
 Every push to `main` triggers `.github/workflows/deploy.yml` — Eleventy
 builds, GitHub Actions publishes `_site/` to GitHub Pages. Live in ~90
-seconds. Custom domain is set via `src/CNAME` (containing
-`shaolinhunggarkungfu.com`) + repo Settings → Pages.
+seconds.
 
-Full setup — including OAuth app, Cloudflare Worker deploy, the Apps Script
-Web App, and DNS — is documented in [`design.md`](./design.md).
+**The deploy has two modes**, gated on a single `PATH_PREFIX` env var so
+you can iterate on the project URL while DNS for the custom domain is
+still being set up:
+
+| Mode | `PATH_PREFIX` in `deploy.yml` | Site URL |
+|---|---|---|
+| Project-site testing | `/<repo>/` | `<user>.github.io/<repo>/` |
+| Custom domain (go-live) | *unset* | `example.com` |
+
+`.eleventy.js` reads the env var and gates *both* the URL prefix and
+whether `src/CNAME` ships — so switching modes is a one-line change in
+`deploy.yml` (plus one click in GitHub Settings → Pages when going the
+other direction). This pattern is intended for reuse across future client
+sites — full walk-through in
+[`design.md`](./design.md#two-deploy-modes--one-env-var) and the reusable
+project-to-domain workflow in
+[`CUSTOMIZATION.md`](./CUSTOMIZATION.md#deploy-modes-test-on-github-first-cut-over-to-custom-domain-later).
+
+Full setup — OAuth app, Cloudflare Worker deploy, Apps Script Web App,
+and DNS — is documented in [`design.md`](./design.md).
 
 ## Documentation
 

@@ -84,6 +84,19 @@ git push -u origin main
 # Later, to pull template updates: `git fetch template && git merge template/main`
 ```
 
+**After either option**, before the first push:
+
+1. Open `.github/workflows/deploy.yml` and change the `PATH_PREFIX` value
+   to match the new repo name — `/acme-widgets/` in this example. This
+   keeps the site building in project-site mode so you can iterate on the
+   GitHub URL until the client's DNS is ready. See
+   [Deploy modes](#deploy-modes-test-on-github-first-cut-over-to-custom-domain-later)
+   for the full switch flow.
+2. Open `src/CNAME` and put the client's real domain in it — one line,
+   no protocol, no trailing slash. The file won't ship until you cut over
+   to custom-domain mode, but it's easier to set it now than remember at
+   go-live.
+
 ---
 
 ## Colors, fonts, logo
@@ -417,6 +430,103 @@ horizontal scroll at 375px viewport — see
 
 ---
 
+## Deploy modes: test on GitHub first, cut over to custom domain later
+
+Every new client site goes through the same lifecycle: you build and
+iterate on the GitHub project URL (fast — no DNS, no cert wait, changes
+are live in ~90 seconds), then cut over to the client's real domain once
+DNS is ready. This template ships with that switch baked in as a single
+env var, `PATH_PREFIX`, so you don't have to remember two independent
+places to change or hand-edit URLs.
+
+### How the switch works
+
+`.eleventy.js` reads `process.env.PATH_PREFIX` and does two things with
+it in lockstep:
+
+```js
+// 1. Every internal URL gets prefixed with it (via the `| url` filter
+//    that every template already uses).
+pathPrefix: process.env.PATH_PREFIX || "/",
+
+// 2. src/CNAME only ships to _site/ when the prefix is unset.
+if (!process.env.PATH_PREFIX || process.env.PATH_PREFIX === "/") {
+  eleventyConfig.addPassthroughCopy("src/CNAME");
+}
+```
+
+That second gate matters: if a CNAME file ships during project-site
+testing, GitHub Pages sets the custom domain and redirects the github.io
+URL to a domain that isn't ready yet. Without the gate, one env var
+would only be doing half the work and you'd have to remember to
+comment/uncomment the passthrough by hand.
+
+`.github/workflows/deploy.yml` sets the env var (or doesn't):
+
+```yaml
+# Mode 1 — project-site testing (default while you're building):
+      - run: npm run build
+        env:
+          PATH_PREFIX: /acme-widgets/     ← must match the repo name
+
+# Mode 2 — custom domain go-live:
+      - run: npm run build                ← delete the env: block entirely
+```
+
+### Cutover checklist (project URL → custom domain)
+
+Once DNS is ready for the client's domain:
+
+1. Point DNS at GitHub Pages — apex A records to `185.199.108.153`,
+   `185.199.109.153`, `185.199.110.153`, `185.199.111.153`; `www` CNAME
+   to `<your-user>.github.io`. Wait for propagation.
+2. In **repo Settings → Pages → Custom domain**, enter the domain, save.
+   Wait for the green DNS check and HTTPS provisioning (up to 24h).
+3. Confirm `src/CNAME` contains the correct domain (one line, no
+   protocol, no trailing slash).
+4. Delete the `env: PATH_PREFIX` block from `deploy.yml`. Push.
+
+On the next build the CNAME ships, the URL prefix disappears, and
+GitHub Pages redirects github.io/`<repo>`/ to the custom domain.
+
+### Reverse checklist (custom domain → project URL)
+
+Rare — usually only when moving a client to a new domain. Do it in this
+order or the sticky Pages setting keeps redirecting:
+
+1. In **repo Settings → Pages → Custom domain**, click **Remove**, save.
+   This is the load-bearing step — GitHub keeps the custom domain
+   configured even after the CNAME file stops shipping, and won't stop
+   redirecting until you clear the field.
+2. Add `env: PATH_PREFIX: /<repo>/` back to the `npm run build` step.
+3. Push.
+
+### Symptoms of a broken switch
+
+- **Unstyled HTML, broken images, blue underlined links** — `PATH_PREFIX`
+  isn't set but the site is being served at the project URL. Absolute
+  `/css/style.css` paths 404 because they resolve to `<user>.github.io/`
+  instead of `<user>.github.io/<repo>/`. Fix: add the env block.
+- **github.io URL immediately redirects to a dead custom domain** — a
+  CNAME file shipped during project-site testing and Pages picked it up.
+  Fix: the gating in `.eleventy.js` prevents this going forward, but
+  once the Pages UI setting is set it's sticky. Clear it in Settings →
+  Pages → Custom domain → Remove.
+- **After going live on the custom domain, some links still point at
+  `/<repo>/`** — `PATH_PREFIX` is still in `deploy.yml`. Delete the env
+  block and re-deploy.
+- **`/admin/` shows "Server Not Found" trying to reach
+  `replace_me_with_your_oauth_worker.workers.dev`** — the CMS on the
+  *hosted* site is trying to auth against the placeholder OAuth Worker
+  URL. Expected until you deploy the Cloudflare Worker (§ "External
+  services setup" below) and update `src/admin/config.yml`
+  `backend.base_url` to the printed `<name>.<account>.workers.dev` URL.
+  Local `npm run cms` sidesteps this — it uses `local_backend: true` so
+  no OAuth flow runs, which is why the CMS works locally on Day 1 but
+  hosted CMS doesn't until you finish the Worker step.
+
+---
+
 ## External services setup for the new site
 
 Every new client site needs its own:
@@ -424,7 +534,12 @@ Every new client site needs its own:
 - **GitHub OAuth App** — one per site (callback URLs are fixed per app)
 - **Cloudflare Worker** — one per OAuth App. Edit `oauth-worker/wrangler.toml`
   `name:` to something unique (e.g. `decap-oauth-proxy-acme`), then deploy
-  from `oauth-worker/`.
+  from `oauth-worker/`. **Then paste the printed
+  `<name>.<account>.workers.dev` URL into `src/admin/config.yml`
+  `backend.base_url`**, replacing the
+  `replace_me_with_your_oauth_worker.workers.dev` placeholder — until you
+  do, the hosted `/admin/` login fails with a "Server Not Found" error.
+  Local `npm run cms` isn't affected (it uses `local_backend: true`).
 - **Google Apps Script Web App** — one per site. Bound to its own Google
   Sheet, with recipient lists in Script Properties. Deploy with
   *Execute as: Me* and *Who has access: **Anyone***. Full steps in
@@ -446,6 +561,10 @@ Before handing a new customized site to a client:
 - [ ] `src/_data/home.json` populated with real sections
 - [ ] Old template blog posts deleted, real ones written or migrated
 - [ ] `src/CNAME` matches the client's actual domain
+- [ ] Deploy mode switched to custom-domain: `env: PATH_PREFIX` block
+      removed from `.github/workflows/deploy.yml` (see
+      [Deploy modes](#deploy-modes-test-on-github-first-cut-over-to-custom-domain-later))
+- [ ] Repo Settings → Pages → Custom domain set + HTTPS enforced
 - [ ] `src/admin/config.yml` `backend.repo` points at the new repo
 - [ ] `src/admin/config.yml` `backend.base_url` points at the new OAuth Worker
 - [ ] `src/_data/forms.json` `endpoint` points at the new Apps Script `/exec` URL

@@ -429,18 +429,73 @@ jobs:
 `enablement: true` on `configure-pages` means the first build auto-turns on
 Pages with Source = GitHub Actions. No manual UI toggle required.
 
-**If the site is served under a subdirectory (project site, not custom
-domain), set a `PATH_PREFIX` env var on the build step:**
+### Two deploy modes — one env var
+
+Sites go through two stages: **test on the GitHub project URL first, cut
+over to the custom domain once DNS is ready.** The two shapes look
+different enough to break silently, so both are gated on a single env
+var, `PATH_PREFIX`, and everything downstream keys off it.
+
+| Mode | `PATH_PREFIX` | Site URL | Absolute asset URLs in HTML | `src/CNAME` in `_site/` |
+|---|---|---|---|---|
+| **Project-site testing** | `/<repo>/` | `<user>.github.io/<repo>/` | `/<repo>/css/style.css` | *not copied* |
+| **Custom domain** | *unset* | `example.com` | `/css/style.css` | copied |
+
+`.eleventy.js` does the wiring in one place — both the URL prefix
+Eleventy emits and whether the CNAME file passes through:
+
+```js
+// pathPrefix — Eleventy prepends this to every URL emitted by the `| url`
+// filter (which every template uses for internal links). Leave "/" default
+// for custom-domain sites.
+pathPrefix: process.env.PATH_PREFIX || "/",
+
+// Ship CNAME only when building for a custom-domain deploy (PATH_PREFIX
+// unset). Under a project-site deploy (github.io/<repo>/), a CNAME file
+// causes GitHub Pages to redirect the github.io URL to the not-yet-
+// configured custom domain — everything appears dead.
+if (!process.env.PATH_PREFIX || process.env.PATH_PREFIX === "/") {
+  eleventyConfig.addPassthroughCopy("src/CNAME");
+}
+```
+
+The workflow simply sets or omits the env var:
 
 ```yaml
+      # Project-site testing (github.io/<repo>/):
       - run: npm run build
         env:
           PATH_PREFIX: /repo-name/
+
+      # Custom-domain go-live: delete the env: block, that's it.
+      - run: npm run build
 ```
 
-Combined with `pathPrefix: process.env.PATH_PREFIX || "/"` in `.eleventy.js`
-and `{{ '/absolute/path' | url }}` in templates, this rewrites every internal
-link. Leave unset for custom-domain sites.
+**Cutting over from project-site testing to custom domain:**
+
+1. Point DNS at GitHub Pages (see §4 DNS + custom domain below), wait for
+   propagation.
+2. Set the domain in **repo Settings → Pages → Custom domain**, wait for
+   the green check and HTTPS provisioning (up to 24h).
+3. Delete the `env: PATH_PREFIX` block from `deploy.yml`. Push. Done.
+
+**Cutting back to project-site testing (rare, e.g. moving to another
+domain):**
+
+1. In **repo Settings → Pages → Custom domain**, click **Remove**. This
+   is the sticky bit — GitHub keeps the setting even after CNAME stops
+   shipping, until you clear it manually.
+2. Re-add `env: PATH_PREFIX: /repo-name/` under `npm run build`. Push.
+
+Without the `PATH_PREFIX` prefix, absolute asset paths (`/css/style.css`,
+`/images/logo.png`) 404 on the project URL because they resolve to the
+domain root instead of `<user>.github.io/<repo>/`. This is the "page
+renders as unstyled HTML with broken images" symptom.
+
+Without the CNAME gating, a CNAME file left in the deployed artifact
+during project-site testing tells GitHub Pages to set the custom domain
+and redirect the github.io URL to a domain whose DNS isn't ready yet —
+same visible symptom, different cause.
 
 ---
 
@@ -541,16 +596,25 @@ sender costs 4.
 
 ### 4. DNS + custom domain (~15 min + up to 24h for TLS cert)
 
-- Add `src/CNAME` — single line, no protocol: `shaolinhunggarkungfu.com`
-- Add `eleventyConfig.addPassthroughCopy("src/CNAME");` in `.eleventy.js`
+This step is the second half of the project-site → custom-domain cutover
+described in [Two deploy modes](#two-deploy-modes--one-env-var). While
+`PATH_PREFIX` is still set on the build, the site keeps living at the
+github.io URL and this step is a no-op.
+
+- `src/CNAME` already exists in the template (single line, no protocol,
+  e.g. `example.com`) and passes through automatically when `PATH_PREFIX`
+  is unset. Nothing to add.
 - Repo → Settings → Pages → **Custom domain** → enter the domain → **Save**
 - DNS at your registrar:
   - Apex: four A records → `185.199.108.153`, `185.199.109.153`,
     `185.199.110.153`, `185.199.111.153`
-  - `www`: CNAME → `adrianwongstudio.github.io`
+  - `www`: CNAME → `<user>.github.io`
 - Wait for GitHub's DNS check to pass
 - Enable **Enforce HTTPS** once the cert issues (up to an hour, sometimes
   longer)
+- Delete the `env: PATH_PREFIX` block from `.github/workflows/deploy.yml`.
+  Push. `.eleventy.js` starts shipping the CNAME on the next build and
+  the github.io URL redirects to the custom domain.
 - **Only ONE repo can claim a given custom domain** at a time — if you
   transfer, clear the setting on the losing repo first
 
@@ -605,15 +669,22 @@ Two mitigations, apply both:
   is invoked, it exits immediately
 - Verify Pages Source is set to **GitHub Actions**, not "Deploy from a branch"
 
-### 4. Project-site subdirectory paths
+### 4. Project-site subdirectory paths (and CNAME cross-talk)
 GitHub Pages serves a repo at `<user>.github.io/<repo>/` if there's no
 custom domain. Absolute paths like `/css/style.css` in your HTML then 404
-because they resolve to the domain root.
+because they resolve to the domain root — the page renders as unstyled
+HTML with broken images.
 
-Fix: `pathPrefix: process.env.PATH_PREFIX || "/"` in `.eleventy.js`, wrap
-internal URLs with `| url` filter, set `PATH_PREFIX=/repo-name/` in the
-build workflow. Custom-domain sites don't need this — leave `PATH_PREFIX`
-unset and paths work at the domain root.
+Compounding trap: if `src/CNAME` also ships to `_site/` during that same
+project-site testing phase, GitHub Pages sees it and redirects the
+github.io URL to the domain named in the file — a domain whose DNS
+usually isn't ready yet during testing. The user sees a dead page and
+can't tell which failure mode they're hitting.
+
+Fix: both are gated on the same `PATH_PREFIX` env var — set it during
+testing, unset it after the custom domain goes live. See
+[Two deploy modes — one env var](#two-deploy-modes--one-env-var) for the
+`.eleventy.js` wiring and the cutover checklist.
 
 ### 5. macOS `npm install -g` permission errors
 `npm install -g wrangler` fails with `EACCES` on default macOS setups (npm's
@@ -649,6 +720,22 @@ The custom-domain field in Pages Settings writes a `CNAME` file to the
 repo. If two repos both have that CNAME, only one wins. **Clear the domain
 from the losing repo before setting it on the new one**, or accept a brief
 404 window during handoff.
+
+### 9. `/admin/` "Server Not Found" on the hosted site
+The template ships with `backend.base_url:
+https://replace_me_with_your_oauth_worker.workers.dev` in
+`src/admin/config.yml` as a placeholder. Until you deploy the Cloudflare
+Worker (§2 of External services above) and update that value to the
+Worker's real URL, hitting the hosted `/admin/` fails at the "Login with
+GitHub" step with a "Server Not Found" browser error trying to reach the
+placeholder host.
+
+This is a **hosted-only** failure — local `npm run cms` uses
+`local_backend: true` and doesn't touch the OAuth Worker at all, so the
+CMS works locally on Day 1. That gap between local-works and
+hosted-doesn't is what makes this confusing the first time. Fix by
+finishing the Worker deploy and pasting the printed
+`<name>.<account>.workers.dev` URL into `backend.base_url`.
 
 ---
 
