@@ -10,6 +10,13 @@
           "heading": "Traditional Hung Gar Kung Fu & Lion Dance",
           "button_label": "Book a Free Trial Class",
           "button_url": "/free-trial/"
+        },
+        {
+          "image": "/images/shaolin-hung-kuen-traced-2000px.png",
+          "alt": "Alt Text",
+          "eyebrow": "Eyebrow",
+          "heading": "heading",
+          "button_label": "botton"
         }
       ]
     },
