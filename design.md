@@ -740,7 +740,45 @@ live under the new mode. Prevention: the deploy workflow now includes a
 "Force Pages source to workflow mode" step that PUTs `build_type=workflow`
 on every run, self-healing this silently if it ever flips again.
 
-### 10. `/admin/` "Server Not Found" on the hosted site
+### 10. OAuth Worker gets overwritten with the Eleventy site
+Recurring failure with a very specific fingerprint: hit `/admin/`, click
+Login with GitHub, land on a Cloudflare 404 for the OAuth Worker's
+`/auth` route. Curl the Worker's root:
+
+```bash
+curl -s https://<worker-url>/ | head -3
+```
+
+If it returns `<!doctype html><title>Home | Shaolin Hung Gar Kung Fu…</title>`
+instead of the OAuth proxy's `Not found` response, someone deployed the
+built Eleventy site *into the Worker slot*. This happens when
+`wrangler deploy` runs from the repo root with an ad-hoc wrangler.toml
+that has an `[assets]` binding, or with `--assets ./_site`, or with any
+config that turns the Worker into a static-asset host. The OAuth code
+is gone; the CMS login can never complete until it's redeployed.
+
+**Prevention (already in place):** `oauth-worker/package.json` has a
+`predeploy` script (`scripts/preflight.js`) that runs before every
+`npm run deploy` and refuses to continue unless:
+
+1. `pwd` basename is `oauth-worker`.
+2. `worker.js` contains the OAuth handler signatures (`handleAuth`,
+   `GITHUB_TOKEN_URL`).
+3. `wrangler.toml` has `name = "shaolin-decap-oauth-proxy"` and
+   `main = "worker.js"`.
+4. `wrangler.toml` has NO `[assets]`, `assets =`, or `[site]` binding.
+
+If any check fails, the script exits 1 with a specific remediation
+message and wrangler never runs. This prevents the accident but does
+NOT prevent someone running `wrangler deploy` directly (bypassing the
+npm script). Always use `npm run deploy` from `oauth-worker/`, never
+bare `wrangler deploy`.
+
+**Recovery when it happens:** from `oauth-worker/`, run `npm run deploy`.
+The preflight passes, wrangler redeploys the OAuth code, secrets are
+untouched (they persist on the Worker name), CMS login works again.
+
+### 11. `/admin/` "Server Not Found" on the hosted site
 The template ships with `backend.base_url:
 https://replace_me_with_your_oauth_worker.workers.dev` in
 `src/admin/config.yml` as a placeholder. Until you deploy the Cloudflare

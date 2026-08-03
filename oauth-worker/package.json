@@ -7,6 +7,7 @@
     "secret:client-id": "wrangler secret put GITHUB_CLIENT_ID",
     "secret:client-secret": "wrangler secret put GITHUB_CLIENT_SECRET",
     "dev": "wrangler dev",
+    "predeploy": "node ./scripts/preflight.js",
     "deploy": "wrangler deploy"
   },
   "devDependencies": {
