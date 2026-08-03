@@ -18,7 +18,6 @@
   --serif: Georgia, "Times New Roman", serif;
 
   --header-h: 84px;
-  --topbar-h: 40px;
   --max-width: 1200px;
 
   color-scheme: light;
@@ -117,22 +116,7 @@ h1, h2, h3, h4, p { margin: 0 0 0.6em; }
 .btn--outline:hover, .btn--outline:focus-visible { background: var(--white); color: var(--ink); }
 
 /* ==========================================================================
-   Top bar (scrolls away — see layout.njk "Sticky header + mobile menu")
-   ========================================================================== */
-.topbar {
-  background: var(--ink);
-  color: var(--white);
-  font-size: 0.85rem;
-  height: var(--topbar-h);
-  display: flex;
-  align-items: center;
-}
-.topbar .wrap { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-.topbar__contact { display: flex; gap: 24px; }
-.topbar__contact a:hover { color: var(--gold); }
-
-/* ==========================================================================
-   Header + nav (sticky, only the header pins — topbar scrolls away)
+   Header + nav (sticky at top of viewport)
    ========================================================================== */
 .site-header {
   position: sticky;
@@ -146,13 +130,20 @@ h1, h2, h3, h4, p { margin: 0 0 0.6em; }
 .site-header .wrap {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 40px;
   height: var(--header-h);
 }
-.brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.15rem; }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-right: auto;
+}
 .brand img { max-height: 54px; width: auto; }
 
-.nav { display: flex; align-items: center; gap: 28px; }
+.nav { display: flex; align-items: center; gap: 20px; }
 .nav a {
   font-weight: 600;
   padding: 8px 2px;
@@ -685,14 +676,12 @@ body.nav-open { overflow: hidden; }
    Responsive — md and below (< 768px): single column, comfortable type
    ========================================================================== */
 @media (max-width: 767px) {
-  .hide-sm { display: none; }
   .section { padding: 48px 0; }
   .grid--2, .grid--3, .grid--4, .services .grid, .feature-cards .grid,
   .blog-list .grid, .team .grid, .site-footer .grid,
   .tile-grid__grid, .related-posts .grid { grid-template-columns: 1fr; }
   .posts { grid-template-columns: 1fr; }
   .gallery-grid { grid-template-columns: repeat(2, 1fr); }
-  .topbar__contact { gap: 12px; }
   .hero-slider__content h1 { font-size: 1.75rem; }
 }
 

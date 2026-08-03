@@ -14,17 +14,6 @@
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <!-- Top bar -->
-  <div class="topbar">
-    <div class="wrap">
-      <ul class="topbar__contact">
-        <li><a href="{{ site.phone | telHref }}">{{ site.phone }}</a></li>
-        <li class="hide-sm"><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
-        {% if site.address %}<li class="hide-sm">{{ site.address }}</li>{% endif %}
-      </ul>
-    </div>
-  </div>
-
   <!-- Header -->
   <header class="site-header" id="site-header">
     <div class="wrap">
