@@ -4,6 +4,11 @@
       "type": "hero_slider",
       "slides": [
         {
+          "heading": "Mr. Bigshot",
+          "image": "/images/enhanced_2x.png",
+          "alt": "Mr. Bigshot"
+        },
+        {
           "image": "/images/shaolin-hung-kuen-2000px.png",
           "alt": "Traditional Hung Gar kung fu training",
           "eyebrow": "Vancouver, BC — Non-Profit School",
@@ -12,7 +17,7 @@
           "button_url": "/free-trial/"
         },
         {
-          "image": "/images/screenshot-2026-08-02-at-17.28.42.png",
+          "image": "/images/enhanced_2x.png",
           "alt": "Alt Text",
           "eyebrow": "Eyebrow",
           "heading": "heading",
