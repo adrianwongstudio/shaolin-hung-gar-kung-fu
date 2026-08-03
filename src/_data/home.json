@@ -21,19 +21,21 @@
       ]
     },
     {
-      "type": "tile_grid",
-      "tiles": [
+      "type": "feature_rows",
+      "rows": [
         {
           "image": "/images/shaolin-hung-kuen-2000px.png",
           "image_alt": "Kung fu students in training stances",
+          "eyebrow": "Classes",
           "heading": "Kung Fu Classes",
-          "text": "Traditional Hung Gar forms, conditioning, and applied technique for youth and adults.",
+          "text": "Traditional Hung Gar forms, conditioning, and applied technique for youth and adults. Rooted in Southern Shaolin lineage.",
           "button_label": "See Classes",
           "button_url": "/kung-fu/"
         },
         {
           "image": "/images/slhk-association-full-3000px.png",
           "image_alt": "Lion dance troupe in performance regalia",
+          "eyebrow": "Troupe",
           "heading": "Lion Dance Classes",
           "text": "Learn the Southern lion tradition — drum, gong, cymbal, and lion work — as a member of our troupe.",
           "button_label": "Learn More",
@@ -41,9 +43,10 @@
         },
         {
           "image": "/images/shaolin-hung-kuen-traced-2000px.png",
-          "image_alt": "Community performance",
+          "image_alt": "Community lion dance performance",
+          "eyebrow": "Performances",
           "heading": "Performances",
-          "text": "Book our lion dance troupe for Chinese New Year, grand openings, weddings, and corporate events.",
+          "text": "Book our lion dance troupe for Chinese New Year, grand openings, weddings, and corporate events across Metro Vancouver.",
           "button_label": "Book Us",
           "button_url": "/book-lion-dance/"
         }

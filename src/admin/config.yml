@@ -203,6 +203,27 @@ collections:
                 fields:
                   - { label: "Heading", name: "heading", widget: "string", required: false, default: "Related Blog Posts" }
 
+              - label: "Feature Rows (alternating image + text)"
+                name: "feature_rows"
+                widget: "object"
+                summary: "Feature Rows — {{fields.heading}}"
+                fields:
+                  - { label: "Section Heading (optional)", name: "heading", widget: "string", required: false }
+                  - label: "Rows"
+                    name: "rows"
+                    widget: "list"
+                    collapsed: true
+                    summary: "{{fields.heading}}"
+                    hint: "Each row is a full-width block with image + text. Layout automatically alternates — first row is image-left, second is image-right, and so on."
+                    fields:
+                      - { label: "Image", name: "image", widget: "image" }
+                      - { label: "Image Alt Text", name: "image_alt", widget: "string", hint: "Describe the photo for screen readers." }
+                      - { label: "Eyebrow (small label above heading)", name: "eyebrow", widget: "string", required: false }
+                      - { label: "Heading", name: "heading", widget: "string" }
+                      - { label: "Text", name: "text", widget: "text", required: false }
+                      - { label: "Button Label (optional)", name: "button_label", widget: "string", required: false }
+                      - { label: "Button Link (optional)", name: "button_url", widget: "string", required: false }
+
               - label: "Two Column"
                 name: "two_column"
                 widget: "object"

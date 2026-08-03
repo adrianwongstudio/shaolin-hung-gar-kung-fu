@@ -171,6 +171,28 @@
   </div>
 </section>
 
+{% elif section.type == "feature_rows" %}
+<section class="section feature-rows">
+  <div class="wrap">
+    {% if section.heading %}<h2 class="feature-rows__heading">{{ section.heading }}</h2>{% endif %}
+    {% for row in section.rows %}
+    <article class="feature-row {{ 'feature-row--image-right' if loop.index0 % 2 == 1 }}">
+      <div class="feature-row__media">
+        {% if row.image %}<img src="{{ row.image | url }}" alt="{{ row.image_alt or '' }}" loading="lazy">{% endif %}
+      </div>
+      <div class="feature-row__body">
+        {% if row.eyebrow %}<span class="eyebrow">{{ row.eyebrow }}</span>{% endif %}
+        <h3 class="feature-row__heading">{{ row.heading }}</h3>
+        {% if row.text %}<p class="feature-row__text">{{ row.text }}</p>{% endif %}
+        {% if row.button_label %}
+        <a class="btn btn--gold" href="{{ row.button_url | url }}">{{ row.button_label }}</a>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
 {% elif section.type == "related_posts" %}
 <section class="section related-posts">
   <div class="wrap">
