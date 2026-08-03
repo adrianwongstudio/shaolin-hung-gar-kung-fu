@@ -565,7 +565,13 @@ Before handing a new customized site to a client:
       removed from `.github/workflows/deploy.yml` (see
       [Deploy modes](#deploy-modes-test-on-github-first-cut-over-to-custom-domain-later))
 - [ ] Repo Settings → Pages → Custom domain set + HTTPS enforced
-- [ ] `src/admin/config.yml` `backend.repo` points at the new repo
+- [ ] `src/admin/config.yml` `backend.repo` is exactly `<owner>/<repo-slug>`
+      as it appears in the GitHub URL — NOT the target domain. Common trap:
+      the template ships with a value that looks like `<owner>/example.com`
+      because the original template's repo was named for its domain; if the
+      new client's repo uses a project shortname (`acme-widgets`), that's
+      the value to use. Getting this wrong fails *after* the OAuth login
+      succeeds, with a "Repo not found" toast in `/admin/`.
 - [ ] `src/admin/config.yml` `backend.base_url` points at the new OAuth Worker
 - [ ] `src/_data/forms.json` `endpoint` points at the new Apps Script `/exec` URL
 - [ ] Apps Script deployed with access = **Anyone** (not "Anyone with a Google account")
