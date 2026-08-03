@@ -5,3 +5,15 @@ coverage/
 *.log
 .eleventy-tmp/
 .claude/
+
+# Local env / secrets — never commit
+.env
+.env.*
+.dev.vars
+.wrangler/
+*.pem
+*.key
+
+# Test artifacts (Playwright — reserved for future)
+playwright-report/
+test-results/

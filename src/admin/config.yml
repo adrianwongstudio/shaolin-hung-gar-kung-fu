@@ -2,7 +2,7 @@ backend:
   name: github
   repo: adrianwongstudio/shaolinhunggarkungfu.com
   branch: main
-  base_url: https://replace_me_with_your_oauth_worker.workers.dev
+  base_url: https://shaolin-decap-oauth-proxy.legacy-financial-planning.workers.dev
 
 local_backend: true
 
