@@ -1,0 +1,19 @@
+# INTENTIONAL DECOY.
+#
+# This file exists so that running `wrangler deploy` from the REPO ROOT fails
+# loudly instead of silently deploying the built Eleventy site to the OAuth
+# Worker slot. Wrangler picks up the nearest wrangler.toml walking up from
+# cwd; without this file, an accidental --assets flag or ad-hoc config could
+# repurpose the worker as a static-asset host and take down /admin/ login.
+#
+# The real OAuth Worker config lives in oauth-worker/wrangler.toml and is
+# only picked up when you `cd oauth-worker` first — as documented in
+# oauth-worker/README.md and design.md gotcha #10.
+#
+# If wrangler complains "Missing entry-point to Worker script" or
+# "Can't find no-such-file... .js" when you run a command here, that's this
+# guard doing its job. cd into oauth-worker/ and try again.
+
+name = "DO_NOT_DEPLOY_FROM_REPO_ROOT_cd_into_oauth-worker_first"
+main = "no-such-file-see-oauth-worker-README.js"
+compatibility_date = "2024-01-01"
