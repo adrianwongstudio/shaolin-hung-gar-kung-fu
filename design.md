@@ -42,22 +42,16 @@ Nothing here needs a database, a Node server, or a paid tier.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                                                              │
-│                       (custom domain)                        │
-└──────────────────────────────────────────────────────────────┘
-                              │  DNS: A records
-                              ▼
-┌──────────────────────────────────────────────────────────────┐
-│                     GitHub Pages                             │
-│              serves _site/ artifact from                     │
-│              the last successful Actions run                 │
+│         shaolinhunggarkungfu.com (custom domain)             │
+│         + shaolinhunggarkungfu.pages.dev (always-on)         │
 └──────────────────────────────────────────────────────────────┘
                               ▲
-                              │  actions/deploy-pages
+                              │  edge CDN, HTTPS auto-provisioned
 ┌──────────────────────────────────────────────────────────────┐
-│                    GitHub Actions                            │
-│       npm ci → npm run build → upload-pages-artifact         │
-│               (triggered on push to main)                    │
+│                   Cloudflare Pages                           │
+│    npm ci → npm run build → serves _site/ from the edge      │
+│               (triggered on push to main via                 │
+│                Cloudflare's GitHub integration)              │
 └──────────────────────────────────────────────────────────────┘
                               ▲
                               │  push
@@ -395,107 +389,73 @@ Three tiers is enough visual variety; continuous font-size lerping looks noisy.
 
 ## Build pipeline
 
-`.github/workflows/deploy.yml`:
+Cloudflare Pages watches the `main` branch of the GitHub repo via its
+own GitHub app integration. Every push runs `npm ci && npm run build`
+in Cloudflare's build environment, then serves the resulting `_site/`
+from the edge. **No GitHub Actions workflow triggers the deploy** —
+Cloudflare owns that end.
+
+Setup is a one-time dashboard flow. Full walk-through in
+[`CLOUDFLARE-PAGES-SETUP.md`](./CLOUDFLARE-PAGES-SETUP.md). Summary:
+
+1. Cloudflare dashboard → Workers & Pages → Create → Pages → Connect to Git.
+2. Pick the repo. Production branch: `main`. Build command: `npm run build`.
+   Output directory: `_site`. `NODE_VERSION`: `22`.
+3. Save and Deploy.
+
+After that, editing content (via CMS or direct commit) → push → build →
+live at `<project>.pages.dev` in ~60 seconds. Custom domain add happens
+in the same dashboard, HTTPS provisions in ~1 minute (not up to 24h like
+GitHub Pages).
+
+### `.github/workflows/ci.yml` — tests only
 
 ```yaml
-name: Deploy to GitHub Pages
+name: CI
 on:
-  push: { branches: [main] }
-  workflow_dispatch:
-permissions: { contents: read, pages: write, id-token: write }
-concurrency: { group: pages, cancel-in-progress: false }
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: 'npm' }
+        with: { node-version: "22", cache: "npm" }
       - run: npm ci
-      - run: npm run build
-      - uses: actions/configure-pages@v5
-        with: { enablement: true }      ← auto-enables Pages on first run
-      - uses: actions/upload-pages-artifact@v3
-        with: { path: _site }
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: { name: github-pages, url: ${{ steps.deployment.outputs.page_url }} }
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
-```
-
-`enablement: true` on `configure-pages` means the first build auto-turns on
-Pages with Source = GitHub Actions. No manual UI toggle required.
-
-### Two deploy modes — one env var
-
-Sites go through two stages: **test on the GitHub project URL first, cut
-over to the custom domain once DNS is ready.** The two shapes look
-different enough to break silently, so both are gated on a single env
-var, `PATH_PREFIX`, and everything downstream keys off it.
-
-| Mode | `PATH_PREFIX` | Site URL | Absolute asset URLs in HTML | `src/CNAME` in `_site/` |
-|---|---|---|---|---|
-| **Project-site testing** | `/<repo>/` | `<user>.github.io/<repo>/` | `/<repo>/css/style.css` | *not copied* |
-| **Custom domain** | *unset* | `example.com` | `/css/style.css` | copied |
-
-`.eleventy.js` does the wiring in one place — both the URL prefix
-Eleventy emits and whether the CNAME file passes through:
-
-```js
-// pathPrefix — Eleventy prepends this to every URL emitted by the `| url`
-// filter (which every template uses for internal links). Leave "/" default
-// for custom-domain sites.
-pathPrefix: process.env.PATH_PREFIX || "/",
-
-// Ship CNAME only when building for a custom-domain deploy (PATH_PREFIX
-// unset). Under a project-site deploy (github.io/<repo>/), a CNAME file
-// causes GitHub Pages to redirect the github.io URL to the not-yet-
-// configured custom domain — everything appears dead.
-if (!process.env.PATH_PREFIX || process.env.PATH_PREFIX === "/") {
-  eleventyConfig.addPassthroughCopy("src/CNAME");
-}
-```
-
-The workflow simply sets or omits the env var:
-
-```yaml
-      # Project-site testing (github.io/<repo>/):
-      - run: npm run build
-        env:
-          PATH_PREFIX: /repo-name/
-
-      # Custom-domain go-live: delete the env: block, that's it.
+      - run: npm run coverage
       - run: npm run build
 ```
 
-**Cutting over from project-site testing to custom domain:**
+This runs on both PRs (guards against merging broken code) and pushes
+to `main` (catches regressions from CMS commits, which land straight on
+main). It **does not deploy** — Cloudflare does that. If the Actions
+run fails on main, Cloudflare's build will fail too and the previous
+successful deploy stays live.
 
-1. Point DNS at GitHub Pages (see §4 DNS + custom domain below), wait for
-   propagation.
-2. Set the domain in **repo Settings → Pages → Custom domain**, wait for
-   the green check and HTTPS provisioning (up to 24h).
-3. Delete the `env: PATH_PREFIX` block from `deploy.yml`. Push. Done.
+### No path prefix, no CNAME juggling
 
-**Cutting back to project-site testing (rare, e.g. moving to another
-domain):**
+Cloudflare Pages serves the site at `/` — both on the `.pages.dev` URL
+and on any custom domain added later. `.eleventy.js` has no
+`pathPrefix`, no environment-var branching, no CNAME conditional
+passthrough. The whole "two deploy modes" complexity that GitHub Pages
+required (path prefix while testing, CNAME gating, sticky Pages "Custom
+domain" field) is gone — those were GitHub-specific failure modes.
 
-1. In **repo Settings → Pages → Custom domain**, click **Remove**. This
-   is the sticky bit — GitHub keeps the setting even after CNAME stops
-   shipping, until you clear it manually.
-2. Re-add `env: PATH_PREFIX: /repo-name/` under `npm run build`. Push.
+### Custom domain go-live
 
-Without the `PATH_PREFIX` prefix, absolute asset paths (`/css/style.css`,
-`/images/logo.png`) 404 on the project URL because they resolve to the
-domain root instead of `<user>.github.io/<repo>/`. This is the "page
-renders as unstyled HTML with broken images" symptom.
+In the Pages project → Custom domains → Set up a custom domain →
+`shaolinhunggarkungfu.com`. Cloudflare adds the DNS record (if the
+domain is on Cloudflare DNS) and issues HTTPS in ~1 minute. Both
+`.pages.dev` and the custom domain stay live simultaneously — no
+switching needed.
 
-Without the CNAME gating, a CNAME file left in the deployed artifact
-during project-site testing tells GitHub Pages to set the custom domain
-and redirect the github.io URL to a domain whose DNS isn't ready yet —
-same visible symptom, different cause.
+Only in-repo change at go-live: flip `src/admin/config.yml` `site_url`
+from `https://shaolinhunggarkungfu.pages.dev` to
+`https://shaolinhunggarkungfu.com` so the CMS "View Live" button
+points at the canonical URL. That's it.
 
 ---
 
@@ -594,29 +554,28 @@ body is `JSON.stringify()` of:
 on Workspace. Each submission notifying 3 staff + 1 confirmation to the
 sender costs 4.
 
-### 4. DNS + custom domain (~15 min + up to 24h for TLS cert)
+### 4. DNS + custom domain (~5 minutes on Cloudflare Pages)
 
-This step is the second half of the project-site → custom-domain cutover
-described in [Two deploy modes](#two-deploy-modes--one-env-var). While
-`PATH_PREFIX` is still set on the build, the site keeps living at the
-github.io URL and this step is a no-op.
+Full setup is in [`CLOUDFLARE-PAGES-SETUP.md`](./CLOUDFLARE-PAGES-SETUP.md).
+Summary:
 
-- `src/CNAME` already exists in the template (single line, no protocol,
-  e.g. `example.com`) and passes through automatically when `PATH_PREFIX`
-  is unset. Nothing to add.
-- Repo → Settings → Pages → **Custom domain** → enter the domain → **Save**
-- DNS at your registrar:
-  - Apex: four A records → `185.199.108.153`, `185.199.109.153`,
-    `185.199.110.153`, `185.199.111.153`
-  - `www`: CNAME → `<user>.github.io`
-- Wait for GitHub's DNS check to pass
-- Enable **Enforce HTTPS** once the cert issues (up to an hour, sometimes
-  longer)
-- Delete the `env: PATH_PREFIX` block from `.github/workflows/deploy.yml`.
-  Push. `.eleventy.js` starts shipping the CNAME on the next build and
-  the github.io URL redirects to the custom domain.
-- **Only ONE repo can claim a given custom domain** at a time — if you
-  transfer, clear the setting on the losing repo first
+- Cloudflare Pages project → **Custom domains** → **Set up a custom
+  domain** → enter `shaolinhunggarkungfu.com`.
+- If DNS is on Cloudflare: the CNAME is added automatically, cert
+  provisions in ~1 minute.
+- If DNS is elsewhere: Cloudflare tells you the CNAME to add at your
+  registrar (usually `<project>.pages.dev`); cert issues once DNS
+  resolves.
+- The `.pages.dev` URL keeps working — optionally add a redirect from
+  it to the custom domain via Pages settings.
+- In-repo: update `src/admin/config.yml` `site_url` from
+  `https://shaolinhunggarkungfu.pages.dev` to
+  `https://shaolinhunggarkungfu.com`. Commit and push.
+
+**No CNAME file, no A records, no HTTPS provisioning wait, no repo
+setting toggles.** The GitHub Pages custom-domain flow (with its 4x
+apex A records + up-to-24h cert wait + sticky repo settings) doesn't
+apply here.
 
 ---
 
@@ -659,7 +618,12 @@ Fix: **build the `posts` collection from a glob** in `.eleventy.js`
 `tags: ["posts"]` line from `src/posts/posts.json`. Now `tags:` is 100%
 user-facing.
 
-### 3. Jekyll runs by default on GitHub Pages
+### 3. Jekyll runs by default on GitHub Pages *(retired — migrated to Cloudflare Pages)*
+
+*This section describes a failure mode of GitHub Pages that no longer
+applies. Cloudflare Pages doesn't run Jekyll. Kept for the historical
+record and in case this template is reused on GH Pages elsewhere.*
+
 Setting a custom domain via the Pages UI has a known quirk where **Source can
 flip back to "Deploy from a branch"** — which triggers Jekyll on the raw
 source. Jekyll tries to parse `.njk` as Liquid and dies on `{% set %}`.
@@ -669,7 +633,12 @@ Two mitigations, apply both:
   is invoked, it exits immediately
 - Verify Pages Source is set to **GitHub Actions**, not "Deploy from a branch"
 
-### 4. Project-site subdirectory paths (and CNAME cross-talk)
+### 4. Project-site subdirectory paths (and CNAME cross-talk) *(retired — migrated to Cloudflare Pages)*
+
+*Both the path-prefix and CNAME failure modes below were GitHub-Pages-
+specific — Cloudflare Pages serves from `/` and manages custom domains
+in-dashboard. Kept for the historical record.*
+
 GitHub Pages serves a repo at `<user>.github.io/<repo>/` if there's no
 custom domain. Absolute paths like `/css/style.css` in your HTML then 404
 because they resolve to the domain root — the page renders as unstyled
@@ -715,13 +684,25 @@ don't control), one DNS change or hosting cancellation breaks every
 reference. Always **commit images into `src/images/`** rather than
 hot-linking.
 
-### 8. Only one repo can claim a custom domain
+### 8. Only one repo can claim a custom domain *(retired — GitHub Pages only)*
+
+*Cloudflare Pages doesn't have this constraint — a single account can
+have any number of Pages projects each with the same or different
+custom domains, and switching is a dashboard action, not a repo-file
+transfer. Kept for the historical record.*
+
 The custom-domain field in Pages Settings writes a `CNAME` file to the
 repo. If two repos both have that CNAME, only one wins. **Clear the domain
 from the losing repo before setting it on the new one**, or accept a brief
 404 window during handoff.
 
-### 9. Pages Source silently reverts from "GitHub Actions" to "Deploy from a branch"
+### 9. Pages Source silently reverts to legacy mode *(retired — GitHub Pages only)*
+
+*This was a GitHub Pages configuration bug. Cloudflare Pages projects
+don't have a "Source" setting to revert — the repo integration is
+per-project and can't switch modes silently. Kept for the historical
+record.*
+
 The Pages configuration has a `build_type` field: `workflow` (this template's
 setup — Actions builds and uploads the artifact) or `legacy` (deploy directly
 from a repo branch). Changing an *unrelated* Pages setting via the UI —

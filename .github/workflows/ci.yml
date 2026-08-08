@@ -1,0 +1,25 @@
+name: CI
+
+# Tests run on both PRs and pushes to main. Push-triggered runs catch
+# regressions from Decap CMS commits, which land straight on main without
+# a PR. Cloudflare Pages handles the actual deploy (via its own GitHub
+# integration) — this workflow does not build for production.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run coverage
+      - run: npm run build

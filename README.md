@@ -32,7 +32,7 @@ All eight pages exist as frames in the
 
 - **[Eleventy 3.x](https://www.11ty.dev/)** — static site generator (Nunjucks + Markdown)
 - **[Decap CMS](https://decapcms.org/)** — in-browser editor at `/admin/`
-- **[GitHub Pages](https://pages.github.com/)** — free hosting via GitHub Actions
+- **[Cloudflare Pages](https://pages.cloudflare.com/)** — free hosting, builds on push, edge CDN
 - **[Cloudflare Workers](https://workers.cloudflare.com/)** — ~90-line OAuth proxy for CMS auth (free tier)
 - **[Google Apps Script Web App](https://developers.google.com/apps-script/guides/web)** — form endpoint. Receives a `fetch()` POST, appends a row to Google Sheets, and emails the enquiry list via `MailApp.sendEmail()`.
 
@@ -73,35 +73,33 @@ parts that can't be asserted against a build output.
 
 ## Deploy
 
-Every push to `main` triggers `.github/workflows/deploy.yml` — Eleventy
-builds, GitHub Actions publishes `_site/` to GitHub Pages. Live in ~90
-seconds.
+Site is built and served by **Cloudflare Pages**. Every push to `main`
+triggers a Cloudflare build automatically via Cloudflare's GitHub
+integration — no GitHub Actions deploy step, no `wrangler` command.
+GitHub only stores the code; Cloudflare serves the site.
 
-**The deploy has two modes**, gated on a single `PATH_PREFIX` env var so
-you can iterate on the project URL while DNS for the custom domain is
-still being set up:
+Setup is a one-time dashboard flow — full walk-through in
+[`CLOUDFLARE-PAGES-SETUP.md`](./CLOUDFLARE-PAGES-SETUP.md). After that:
+edit content → commit → push → live in ~60 seconds at
+`shaolinhunggarkungfu.pages.dev`, and (once the custom domain is
+added in the Pages dashboard) at `shaolinhunggarkungfu.com`.
 
-| Mode | `PATH_PREFIX` in `deploy.yml` | Site URL |
-|---|---|---|
-| Project-site testing | `/<repo>/` | `<user>.github.io/<repo>/` |
-| Custom domain (go-live) | *unset* | `example.com` |
+`.github/workflows/ci.yml` still runs on PRs and pushes to `main` — it
+tests but does not deploy. Cloudflare handles that end.
 
-`.eleventy.js` reads the env var and gates *both* the URL prefix and
-whether `src/CNAME` ships — so switching modes is a one-line change in
-`deploy.yml` (plus one click in GitHub Settings → Pages when going the
-other direction). This pattern is intended for reuse across future client
-sites — full walk-through in
-[`design.md`](./design.md#two-deploy-modes--one-env-var) and the reusable
-project-to-domain workflow in
-[`CUSTOMIZATION.md`](./CUSTOMIZATION.md#deploy-modes-test-on-github-first-cut-over-to-custom-domain-later).
+The one Cloudflare Worker that's still separate is the
+[OAuth proxy](./oauth-worker/README.md) that lets Decap CMS log in via
+GitHub — that lives in its own Worker (`oauth-worker/`) so a site
+deploy can never overwrite it.
 
-Full setup — OAuth app, Cloudflare Worker deploy, Apps Script Web App,
-and DNS — is documented in [`design.md`](./design.md).
+Full external-service setup — GitHub OAuth App, Cloudflare Worker
+deploy, Apps Script Web App — in [`design.md`](./design.md).
 
 ## Documentation
 
 | Read this | For |
 |---|---|
+| [`CLOUDFLARE-PAGES-SETUP.md`](./CLOUDFLARE-PAGES-SETUP.md) | One-time Cloudflare Pages dashboard setup — how the site actually gets deployed. |
 | [`design.md`](./design.md) | How the site works — architecture, content model, CMS design, external services, gotchas. |
 | [`testing.md`](./testing.md) | How to verify it still works — manual playbook, regression checklist, debug flowchart. |
 | [`CUSTOMIZATION.md`](./CUSTOMIZATION.md) | How to fork this as a template for a new client site — rebrand, retheme, add pages, add section types. |

@@ -100,13 +100,15 @@ describe("category and tag filter pages", () => {
 });
 
 describe("static-file hygiene (from testing.md's local build verification)", () => {
-  it("copies CNAME to the site root with the right domain", () => {
-    expect(read("CNAME").trim()).toBe("shaolinhunggarkungfu.com");
+  it("does not ship CNAME or .nojekyll (GitHub-Pages-only cargo — Cloudflare Pages handles custom domain via dashboard)", () => {
+    expect(fs.existsSync(path.join(SITE, "CNAME"))).toBe(false);
+    expect(fs.existsSync(path.join(SITE, ".nojekyll"))).toBe(false);
   });
 
-  it("copies an empty .nojekyll to the site root", () => {
-    const stat = fs.statSync(path.join(SITE, ".nojekyll"));
-    expect(stat.size).toBe(0);
+  it("emits absolute paths without a repo prefix (Cloudflare Pages serves from /)", () => {
+    const html = read("index.html");
+    expect(html).toMatch(/href="\/css\/style\.css"/);
+    expect(html).not.toMatch(/shaolin-hung-gar-kung-fu\/css/);
   });
 
   it("contains no leftover third-party form service residue", () => {
@@ -191,15 +193,10 @@ describe("design tokens applied to the build", () => {
 });
 
 describe("GitHub Actions workflows", () => {
-  it("deploy.yml is valid YAML", () => {
+  it("ci.yml is valid YAML", () => {
     // Regression guard: `${{ }}` inside an inline flow mapping (`{ url: ${{ ... }} }`)
     // is invalid YAML — the braces collide. Must use block-style mapping instead.
-    const raw = fs.readFileSync(path.join(ROOT, ".github", "workflows", "deploy.yml"), "utf8");
-    expect(() => yaml.load(raw)).not.toThrow();
-  });
-
-  it("pr-check.yml is valid YAML", () => {
-    const raw = fs.readFileSync(path.join(ROOT, ".github", "workflows", "pr-check.yml"), "utf8");
+    const raw = fs.readFileSync(path.join(ROOT, ".github", "workflows", "ci.yml"), "utf8");
     expect(() => yaml.load(raw)).not.toThrow();
   });
 });

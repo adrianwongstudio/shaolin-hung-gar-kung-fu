@@ -86,16 +86,13 @@ git push -u origin main
 
 **After either option**, before the first push:
 
-1. Open `.github/workflows/deploy.yml` and change the `PATH_PREFIX` value
-   to match the new repo name — `/acme-widgets/` in this example. This
-   keeps the site building in project-site mode so you can iterate on the
-   GitHub URL until the client's DNS is ready. See
-   [Deploy modes](#deploy-modes-test-on-github-first-cut-over-to-custom-domain-later)
-   for the full switch flow.
-2. Open `src/CNAME` and put the client's real domain in it — one line,
-   no protocol, no trailing slash. The file won't ship until you cut over
-   to custom-domain mode, but it's easier to set it now than remember at
-   go-live.
+1. Follow [`CLOUDFLARE-PAGES-SETUP.md`](./CLOUDFLARE-PAGES-SETUP.md) to
+   point a new Cloudflare Pages project at the new repo. First build
+   runs automatically; site is live at `<project>.pages.dev` in ~60
+   seconds. Custom domain gets added later in the same dashboard.
+2. `src/CNAME` doesn't exist any more — Cloudflare Pages manages the
+   custom domain in-dashboard, not via a repo file. Nothing to do
+   here.
 
 ---
 
@@ -430,7 +427,29 @@ horizontal scroll at 375px viewport — see
 
 ---
 
-## Deploy modes: test on GitHub first, cut over to custom domain later
+## Deploy: Cloudflare Pages (one dashboard flow, no per-mode fiddling)
+
+Cloudflare Pages watches the `main` branch and builds on every push.
+GitHub only stores the code; Cloudflare serves the site. Setup is a
+one-time dashboard flow — see
+[`CLOUDFLARE-PAGES-SETUP.md`](./CLOUDFLARE-PAGES-SETUP.md) for the full
+walk-through. Summary:
+
+1. Cloudflare dashboard → Workers & Pages → Create → Pages → Connect
+   to Git.
+2. Pick the new client's repo.
+3. Build command `npm run build`, output directory `_site`,
+   `NODE_VERSION` `22`.
+4. Save and Deploy.
+
+Site is live at `<project>.pages.dev` in ~60 seconds. Custom domain
+added in the same dashboard, HTTPS in ~1 minute.
+
+The single in-repo change per new client: `src/admin/config.yml`
+`site_url` → the client's `<project>.pages.dev` URL (and later, their
+custom domain).
+
+## Legacy: the retired GitHub Pages workflow
 
 Every new client site goes through the same lifecycle: you build and
 iterate on the GitHub project URL (fast — no DNS, no cert wait, changes
@@ -569,11 +588,13 @@ Before handing a new customized site to a client:
 - [ ] `src/_data/site.json` filled in with real values, no placeholders
 - [ ] `src/_data/home.json` populated with real sections
 - [ ] Old template blog posts deleted, real ones written or migrated
-- [ ] `src/CNAME` matches the client's actual domain
-- [ ] Deploy mode switched to custom-domain: `env: PATH_PREFIX` block
-      removed from `.github/workflows/deploy.yml` (see
-      [Deploy modes](#deploy-modes-test-on-github-first-cut-over-to-custom-domain-later))
-- [ ] Repo Settings → Pages → Custom domain set + HTTPS enforced
+- [ ] Cloudflare Pages project created and pointed at the repo (see
+      [`CLOUDFLARE-PAGES-SETUP.md`](./CLOUDFLARE-PAGES-SETUP.md)) — build
+      command `npm run build`, output `_site`, `NODE_VERSION=22`
+- [ ] Custom domain added in Cloudflare Pages dashboard → Custom domains,
+      HTTPS provisioned (usually <1 minute)
+- [ ] `src/admin/config.yml` `site_url` matches the live URL (the
+      `<project>.pages.dev` initially, then the custom domain once live)
 - [ ] `src/admin/config.yml` `backend.repo` is exactly `<owner>/<repo-slug>`
       as it appears in the GitHub URL — NOT the target domain. Common trap:
       the template ships with a value that looks like `<owner>/example.com`

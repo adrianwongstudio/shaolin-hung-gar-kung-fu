@@ -10,10 +10,10 @@ media_folder: "src/images"
 public_folder: "/images"
 
 # site_url is what the "View Live" button prefixes preview_path with.
-# While DNS for shaolinhunggarkungfu.com is being set up, we're deploying
-# under the project URL — swap the two lines when the custom domain goes
-# live (same time you drop PATH_PREFIX from .github/workflows/deploy.yml).
-site_url: https://adrianwongstudio.github.io/shaolin-hung-gar-kung-fu
+# Set to the Cloudflare Pages default URL until the custom domain
+# (shaolinhunggarkungfu.com) is added in the Pages dashboard. When it is,
+# flip this to https://shaolinhunggarkungfu.com and commit.
+site_url: https://shaolinhunggarkungfu.pages.dev
 # site_url: https://shaolinhunggarkungfu.com
 
 collections:

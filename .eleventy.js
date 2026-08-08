@@ -8,13 +8,6 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/js");
   eleventyConfig.addPassthroughCopy("src/images");
   eleventyConfig.addPassthroughCopy("src/admin");
-  // Ship CNAME only when building for a custom-domain deploy (PATH_PREFIX unset).
-  // Under a project-site deploy (github.io/<repo>/), a CNAME file causes GitHub
-  // Pages to redirect the github.io URL to the not-yet-configured custom domain.
-  if (!process.env.PATH_PREFIX || process.env.PATH_PREFIX === "/") {
-    eleventyConfig.addPassthroughCopy("src/CNAME");
-  }
-  eleventyConfig.addPassthroughCopy("src/.nojekyll");
 
   eleventyConfig.addCollection("posts", (collection) =>
     collection.getFilteredByGlob("src/posts/*.md").reverse()
@@ -44,7 +37,6 @@ module.exports = function (eleventyConfig) {
     },
     markdownTemplateEngine: "njk",
     htmlTemplateEngine: "njk",
-    pathPrefix: process.env.PATH_PREFIX || "/",
   };
 };
 
